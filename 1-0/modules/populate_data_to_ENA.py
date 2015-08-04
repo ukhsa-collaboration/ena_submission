@@ -177,7 +177,7 @@ def create_dict_with_data(dir_of_input_data,refname,data_file, delim="\t", heade
 	------
 	dir_of_input_data, dir: This is the directory that contains all the files to be uploaded to ENA.  NOTE: the fastq files must be in the following format: *.R1.fastq.gz and *.R2.fastq.gz.
 	refname, str: You must provide a reference name for your study, e.g. phe_ecoli
-	data_file, file : this text file must have at least three columns seperated by tabs in the following order and with the following headings:  Column 1: SAMPLE, Column 2: SCIENTIFIC_NAME, Column 3: DESCRIPTION.  If you like to add further data then add it after the DESCRIPTION column.
+	data_file, file : this text file must have at least three columns seperated by tabs in the following order and with the following headings:  Column 1: SAMPLE, Column 2: TAXON_ID, Column 3: SCIENTIFIC_NAME, Column 4: DESCRIPTION.  If you like to add further data then add it after the DESCRIPTION column.
 	header, True or False :  if True the first line will be considered a header line
 
 
@@ -238,7 +238,7 @@ def sample_xml(dir_of_input_data,refname,data_file,center_name,out_dir):
 	Params
     ------
     dir_of_input_data, dir: This is the directory that contains all the files to be uploaded to ENA.
-    data_file, file : this text file must have at least three columns seperated by tabs in the following order and with the following headings:  Column 1: SAMPLE, Column 2: SCIENTIFIC_NAME, Column 3: DESCRIPTION.  If you like to add further data then add it after the DESCRIPTION column. 
+    data_file, file : this text file must have at least three columns seperated by tabs in the following order and with the following headings:  Column 1: SAMPLE, Column 2: TAXON_ID, Column 3: SCIENTIFIC_NAME, Column 4: DESCRIPTION.  If you like to add further data then add it after the DESCRIPTION column.
     refname, str: You must provide a reference name for your study, e.g. phe_ecoli
     center_name, str : name of the center, e.g. PHE
     taxon_id, str : the taxon id of the organism from NCBI
@@ -317,7 +317,7 @@ def experiment_xml(dir_of_input_data,data_file,refname,center_name,library_strat
 	Params
 	------
 	dir_of_input_data, dir: This is the directory that contains all the files to be uploaded to ENA.
-	data_file, file : this text file must have at least three columns seperated by tabs in the following order and with the following headings:  Column 1: SAMPLE, Column 2: SCIENTIFIC_NAME, Column 3: DESCRIPTION.  If you like to add further data then add it after the DESCRIPTION column.
+	data_file, file : this text file must have at least three columns seperated by tabs in the following order and with the following headings:  Column 1: SAMPLE, Column 2: TAXON_ID, Column 3: SCIENTIFIC_NAME, Column 4: DESCRIPTION.  If you like to add further data then add it after the DESCRIPTION column.
     center_name, str : name of the center, e.g. PHE
     refname, str: A unique name for the whole submission. This name must not have been used before in any other submission to ENA.
     library_strategy, str : default 'WGS'.
@@ -389,7 +389,6 @@ def run_xml(dir_of_input_data,refname,center_name,filetype,out_dir):
 	Params
     ------
     dir_of_input_data, dir: This is the directory that contains all the files to be uploaded to ENA.
-    data_file, file : this text file must have at least three columns seperated by tabs in the following order and with the following headings:  Column 1: SAMPLE, Column 2: SCIENTIFIC_NAME, Column 3: DESCRIPTION.  If you like to add further data then add it after the DESCRIPTION column.
     center_name, str : name of the center.  Default is PHE
     refname, str: A unique name for the whole submission. This name must not have been used before in any other submission to ENA.
     filetype, str: the default is fastq.
@@ -490,59 +489,59 @@ def study_xml(title_and_abstract_file,center_name,refname,out_dir):
 
 	print "\nSuccessfully created study.xml file\n"
 
-def submission_xml(refname,center_name,out_dir,release,hold_date=''):
+	def submission_xml(refname,center_name,out_dir,release=False,hold_date=''):
 
-	'''
-	submission_xml(refname,center_name,out_dir,release,hold_date='')
-	
-	This function generates a submission.xml file needed for submission of data to ENA. It is the final of the five xml files needed.
+		'''
+		submission_xml(refname,center_name,out_dir,release,hold_date='')
+		
+		This function generates a submission.xml file needed for submission of data to ENA. It is the final of the five xml files needed.
 
-	Params
-    ------
-    center_name, str : name of the center.  Default is PHE
-    refname, str: A unique name for the whole submission. This name must not have been used before in any other submission to ENA.
-    center_project_name, str: provide a centre project name, default = PHE_SCIENTIFIC_PROJECT
-    release, True or False: If True then the data would be immediatley available publicly.  If FALSE then it would be held for a default of 2 years privately.
-    hold_date, date: The date to which you like to release your data publicly.  default is two years.
-    out_dir, str : name of the new xml file
+		Params
+	    ------
+	    center_name, str : name of the center.  Default is PHE
+	    refname, str: A unique name for the whole submission. This name must not have been used before in any other submission to ENA.
+	    center_project_name, str: provide a centre project name, default = PHE_SCIENTIFIC_PROJECT
+	    release, True or False: If True then the data would be immediatley available publicly.  If FALSE then it would be held for a default of 2 years privately.
+	    hold_date, date: The date to which you like to release your data publicly.  default is two years.
+	    out_dir, str : name of the new xml file
 
-    return
-    ------
+	    return
+	    ------
 
-    outfile, file : a submission.xml file needed for ENA submission.
+	    outfile, file : a submission.xml file needed for ENA submission.
 
-	'''
+		'''
 
-	xml_files = ["study", "sample", "experiment", "run"]
+		xml_files = ["study", "sample", "experiment", "run"]
 
-	submission_set = ET.Element('SUBMISSION_SET')
-	submission = ET.SubElement(submission_set, 'SUBMISSION', alias=refname, center_name=center_name)
-	actions = ET.SubElement(submission, "ACTIONS")
-	for xml_file in xml_files:
+		submission_set = ET.Element('SUBMISSION_SET')
+		submission = ET.SubElement(submission_set, 'SUBMISSION', alias=refname, center_name=center_name)
+		actions = ET.SubElement(submission, "ACTIONS")
+		for xml_file in xml_files:
+			action = ET.SubElement(actions, "ACTION")
+			add = ET.SubElement(action, "ADD", source=xml_file+".xml", schema=xml_file)
+
+		# if a hold date is given until releasing publicly
 		action = ET.SubElement(actions, "ACTION")
-		add = ET.SubElement(action, "ADD", source=xml_file+".xml", schema=xml_file)
 
-	# if a hold date is given until releasing publicly
-	action = ET.SubElement(actions, "ACTION")
+		if hold_date:
+			hold = ET.SubElement(action, "HOLD", HoldUntilDate=hold_date)
+		# else if release is given, i.e. release immediatley to the public
+		elif release:
+			release = ET.SubElement(action, "RELEASE")
+		# otherwise hold for two years and then make it public
+		else:
+			hold = ET.SubElement(action, "HOLD")
+		# use the indent function to indent the xml file
+		indent(submission_set)
+		# create tree
+		tree = ET.ElementTree(submission_set)
 
-	if hold_date:
-		hold = ET.SubElement(action, "HOLD", HoldUntilDate=hold_date)
-	# else if release is given, i.e. release immediatley to the public
-	elif release:
-		release = ET.SubElement(action, "RELEASE")
-	# otherwise hold for two years and then make it public
-	else:
-		hold = ET.SubElement(action, "HOLD")
-	# use the indent function to indent the xml file
-	indent(submission_set)
-	# create tree
-	tree = ET.ElementTree(submission_set)
+		# out_dirput to outfile
+		with open(out_dir+"/submission.xml", 'w') as outfile:
+			tree.write(outfile, xml_declaration=True, encoding='utf-8', method="xml")
 
-	# out_dirput to outfile
-	with open(out_dir+"/submission.xml", 'w') as outfile:
-		tree.write(outfile, xml_declaration=True, encoding='utf-8', method="xml")
-
-	print "\nSuccessfully created submission.xml file\n"
+		print "\nSuccessfully created submission.xml file\n"
 
 def run_curl_command(ftp_user_name,ftp_password,out):
 
