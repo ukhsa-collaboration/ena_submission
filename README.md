@@ -1,4 +1,4 @@
-This tool will in a single step creates the necessary xml files and uploads all your fastq files to the ENA repository.
+This tool in a single step will create the necessary xml files and uploads all your fastq files to the ENA repository.
 
 Dependencies: None
 
