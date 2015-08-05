@@ -1,10 +1,99 @@
+**README for ena_submission tool**
+
 This tool in a single step will create the necessary xml files and uploads all your fastq files to the ENA repository.
 
-Dependencies: None
+Dependencies
+------------
+------------
+
+None.
+
+
+Required files
+--------------
+--------------
+
+To upload your fastq files to ENA, you will need the following:
+1- A directory which contains all your fastq files (fwd and rev).  The fastq file must be in the following format:
+
+SAMPLE_NAME.whatever_you_like.R1.fastq.gz
+SAMPLE_NAME.whatever_you_like.R2.fastq.gz
+
+E.g. 
+
+MN127.processed.R1.fastq.gz
+MN127.processed.R2.fastq.gz
+
+2- A text file that contains all the information for each of your samples.  The text file should contain four required columns.  You may add as many coloumns of data as you wish after the fourth required coloumn.  The columns are separated by tabs.  e.g. (note the headings are required as seen below):
+SAMPLE \t TAXON_ID \t SCIENTIFIC_NAME \t DESCRIPTION
+
+data....
+
+3- A text file that contains the title for your project and an abstract explaining the project.  The two coloumns must be separated by tabs. There are no headings needed here. e.g.
+
+Bioinformatics for biologists \t Bioinformatics is great for biologists.....etc
+
+4- An ENA ftp username and password.  If you do not have one, you need to contact ENA at: datasubs@ebi.ac.uk.
+
+Examples of commands
+--------------------
+--------------------
+
+If you wish to run all the submission in one single step, you will need:
+
+  -i : dir to your fastq files
+  -r : a reference name for your project
+  -f : the path to the data file
+  -a : the path to the title and abstract text file
+  -o : the path to the output directory
+  -user : ENA username
+  -pass : ENA password
+
+E.g.
+
+  python run_xml_generation.py -x all -i /phengs/hpc_projects/mycoplasma/samples/fastqs -r phe_mycoplasma -f /phengs/hpc_projects/mycoplasma/data_file_for_ena_submission.txt -o /phengs/hpc_projects/mycoplasma/ena_submission -a /phengs/hpc_projects/mycoplasma/title_and_abstract_for_ena.txt -user Webin-40432 -pass XXXXX
+
+You may wish to run just one step. These are the different steps you may run manually:
+  
+  --create_checksums_file : only create the checksums file for my fastqs. e.g.
+  
+    python run_xml_generation.py -cs -i /phengs/hpc_projects/mycoplasma/samples/fastqs -r test3
+
+  --upload_data_to_ena_ftp_server : only upload the data to ENA. e.g.
+  
+    python run_xml_generation.py -ftp -i /phengs/hpc_projects/mycoplasma/samples/fastqs -r phe_mycoplasma -user Webin-40432 -pass XXXXX
+
+  -x sample : to create sample.xml only. e.g.
+
+    python run_xml_generation.py -x sample -i /phengs/hpc_projects/mycoplasma/samples/fastqs -r phe_mycoplasma -f /phengs/hpc_projects/mycoplasma/data_file_for_ena_submission.txt -t 2104 -o /phengs/hpc_projects/mycoplasma/ena_submission
+
+  -x experiment : to create experiment.xml only. e.g.
+
+    python run_xml_generation.py -x experiment -i /phengs/hpc_projects/mycoplasma/samples/fastqs -r phe_mycoplasma -f /phengs/hpc_projects/mycoplasma/data_file_for_ena_submission.txt -o /phengs/hpc_projects/mycoplasma/ena_submission  
+
+  -x run : to create run.xml only. e.g.
+
+    python run_xml_generation.py -x run -i /phengs/hpc_projects/mycoplasma/samples/fastqs -r phe_mycoplasma -o /phengs/hpc_projects/mycoplasma/ena_submission
+
+  -x study : to create study.xml only. e.g.
+
+    python run_xml_generation.py -x study -a /phengs/hpc_projects/mycoplasma/title_and_abstract_for_ena.txt -r phe_mycoplasma -i /phengs/hpc_projects/mycoplasma/samples/fastqs -o /phengs/hpc_projects/mycoplasma/ena_submission
+
+  -x submission : to create submission.xml only. e.g.
+
+    python run_xml_generation.py -x submission -i /phengs/hpc_projects/mycoplasma/samples/fastqs -o /phengs/hpc_projects/mycoplasma/ena_submission -r phe_mycoplasma
+
+  -curl : just run curl command.  Note: you must have uploaded the data and created all the xml files to run the curl command. e.g.
+
+    python run_xml_generation.py -curl -user Webin-40432 -pass XXXX -o /phengs/hpc_projects/mycoplasma/ena_submission
+
+Usage
+-----
+-----
 
     usage: run_xml_generation.py [-h] [--xml_file XML_FILE]
                                  [--dir_of_input_data DIR_OF_INPUT_DATA]
-                                 [-data_file DATA_FILE]
+                                 [--data_file DATA_FILE]
                                  [--ftp_user_name FTP_USER_NAME]
                                  [--ftp_password FTP_PASSWORD]
                                  [--title_and_abstract_file TITLE_AND_ABSTRACT_FILE]
@@ -82,3 +171,10 @@ Dependencies: None
       --out_dir OUT_DIR, -o OUT_DIR
                             please provide the path to the output directory which
                             will include all the xml files.
+
+Contact
+-------
+-------
+
+Ali Al-Shahib
+ali.al-shahib@phe.gov.uk
