@@ -1,4 +1,5 @@
-**README for ena_submission tool**
+README for ena_submission tool
+------------------------------
 
 This tool in a single step will create the necessary xml files and uploads all your fastq files to the ENA repository.
 
@@ -41,29 +42,29 @@ Examples of commands
 
 If you wish to run all the submission in one single step, you will need:
 
-  -i : dir to your fastq files
-  -r : a reference name for your project
-  -f : the path to the data file
-  -a : the path to the title and abstract text file
-  -o : the path to the output directory
-  -user : ENA username
-  -pass : ENA password
+      -i : dir to your fastq files
+      -r : a reference name for your project
+      -f : the path to the data file
+      -a : the path to the title and abstract text file
+      -o : the path to the output directory
+      -user : ENA username
+      -pass : ENA password
 
 E.g.
 
-  python run_xml_generation.py -x all -i /phengs/hpc_projects/mycoplasma/samples/fastqs -r phe_mycoplasma -f /phengs/hpc_projects/mycoplasma/data_file_for_ena_submission.txt -o /phengs/hpc_projects/mycoplasma/ena_submission -a /phengs/hpc_projects/mycoplasma/title_and_abstract_for_ena.txt -user Webin-40432 -pass XXXXX
+    python run_xml_generation.py -x all -i /phengs/hpc_projects/mycoplasma/samples/fastqs -r phe_mycoplasma -f /phengs/hpc_projects/mycoplasma/data_file_for_ena_submission.txt -o /phengs/hpc_projects/mycoplasma/ena_submission -a /phengs/hpc_projects/mycoplasma/title_and_abstract_for_ena.txt -user Webin-40432 -pass XXXXX
 
 You may wish to run just one step. These are the different steps you may run manually:
   
-  --create_checksums_file : only create the checksums file for my fastqs. e.g.
+--create_checksums_file : only create the checksums file for my fastqs. e.g.
   
     python run_xml_generation.py -cs -i /phengs/hpc_projects/mycoplasma/samples/fastqs -r test3
 
-  --upload_data_to_ena_ftp_server : only upload the data to ENA. e.g.
+--upload_data_to_ena_ftp_server : only upload the data to ENA. e.g.
   
     python run_xml_generation.py -ftp -i /phengs/hpc_projects/mycoplasma/samples/fastqs -r phe_mycoplasma -user Webin-40432 -pass XXXXX
 
-  -x sample : to create sample.xml only. e.g.
+-x sample : to create sample.xml only. e.g.
 
     python run_xml_generation.py -x sample -i /phengs/hpc_projects/mycoplasma/samples/fastqs -r phe_mycoplasma -f /phengs/hpc_projects/mycoplasma/data_file_for_ena_submission.txt -t 2104 -o /phengs/hpc_projects/mycoplasma/ena_submission
 
