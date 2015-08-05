@@ -15,6 +15,7 @@ Required files
 --------------
 
 To upload your fastq files to ENA, you will need the following:
+
 1- A directory which contains all your fastq files (fwd and rev).  The fastq file must be in the following format:
 
 SAMPLE_NAME.whatever_you_like.R1.fastq.gz
