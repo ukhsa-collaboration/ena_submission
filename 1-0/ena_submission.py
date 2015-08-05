@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import os, os.path, sys, subprocess, argparse, glob, inspect
 
 module_folder_paths = ["modules"]
