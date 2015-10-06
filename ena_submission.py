@@ -18,9 +18,9 @@ We have set parser = argparse.ArgumentParser() and added all arguments by adding
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument('--xml_file', '-x', help='please provide the name for the xml you like to generate, one of the following:all,experiment,run,sample,study,submission')
+parser.add_argument('--generate_xml_file_for', '-x', help='please provide the name for the xml you like to generate, one of the following:all,experiment,run,sample,study,submission')
 parser.add_argument('--dir_of_input_data', '-i', help='please provide the path for the files you like to upload to ENA. NOTE: the fastq files must be in the following format: *.R1.fastq.gz and *.R2.fastq.gz.')
-parser.add_argument('-data_file', '-f', help='data_file, file : this text file must have at least three columns seperated by tabs in the following order and with the following headings:  Column 1: SAMPLE, Column 2: TAXON_ID, Column 3: SCIENTIFIC_NAME, Column 4: DESCRIPTION.  If you like to add further data then add it after the DESCRIPTION column.')
+parser.add_argument('--data_file', '-f', help='data_file, file : this text file must have at least four columns seperated by TABS in the following order and with the following headings:  Column 1: SAMPLE, Column 2: TAXON_ID, Column 3: SCIENTIFIC_NAME, Column 4: DESCRIPTION.  If you like to add further data then add it after the DESCRIPTION column.')
 parser.add_argument('--ftp_user_name', '-user', help='please provide the ftp user name')
 parser.add_argument('--ftp_password', '-pass', help='please provide the ftp password')
 parser.add_argument('--title_and_abstract_file', '-a', help='please provide the title and abstract text file.  This is needed to generate the study.xml file.  The file should be in the following format: full title of the project\tabstract')
@@ -32,7 +32,7 @@ parser.add_argument('--library_selection', '-e', help='please provide the librar
 parser.add_argument('--read_length', '-l', help='Please provide the read length', default='100')
 parser.add_argument('--read_sdev', '-sdev', help='Please provide the read stdv', default='0.0')
 parser.add_argument('--instrument_model', '-m', help='please provide the name of the instrument model used', default='Illumina HiSeq 2500')
-parser.add_argument('--filetype', '-F', help='Please provide the file type', default='fastq')
+parser.add_argument('--filetype', '-F', help='Please provide the file type, default=fastq', default='fastq')
 # parser.add_argument('--center_project_name', '-p', help='Give the study a project name.  This is needed for the study.xml file', default='PHE_SCIENTIFIC_PROJECT')
 # parser.add_argument('--suffix', '-suffix', help='Please provide the suffix of your files. Note: your suffix must contain R1 in it, e.g. prefix.R1.fastq.gz', default='R1.fastq.gz')
 parser.add_argument('--hold_date', '-ho', help='This option will hold the data privately until a specified date.  Please provide the specified date using the following format: YYYY-MM-DD')
@@ -66,7 +66,7 @@ def main():
 		populate_data_to_ENA.run_curl_command(opts.ftp_user_name,opts.ftp_password,opts.out_dir)
 		sys.exit()
 
-	elif not opts.xml_file:
+	elif not opts.generate_xml_file_for:
 		print("\n-x flag not provided! You must supply which xml file(s) you like to generate. options are all,sample,experiment,run,study,submission.\n\n")
 		print parser.print_help()
 		sys.exit()
@@ -78,7 +78,7 @@ def main():
 
 	else:
 
-		if opts.xml_file == "all":
+		if opts.generate_xml_file_for == "all":
 			print "\nYou would like me to generate all the xml files needed to submit your data to ENA....\nLet me check if you have provided all the necessary information....\n"
 
 			check_if_flag_is_provided(opts.ftp_user_name, "ftp_user_name", "-user")
@@ -106,9 +106,9 @@ def main():
 
 			print "All done...please check if all the files have been uploaded to ENA."
 
-		elif opts.xml_file == "sample":
+		elif opts.generate_xml_file_for == "sample":
 
-			print "\nYou would like me to generate the", opts.xml_file,".xml file needed to submit your data to ENA....\nLet me check if you have provided all the necessary information....\n"
+			print "\nYou would like me to generate the", opts.generate_xml_file_for,".xml file needed to submit your data to ENA....\nLet me check if you have provided all the necessary information....\n"
 
 			check_if_flag_is_provided(opts.dir_of_input_data,"dir_of_input_data","-i")
 			check_if_flag_is_provided(opts.refname,"refname","-r")
@@ -117,11 +117,11 @@ def main():
 
 			populate_data_to_ENA.sample_xml(opts.dir_of_input_data,opts.refname,opts.data_file,opts.center_name,opts.out_dir)
 
-			print "\nYour", opts.xml_file,".xml file have been generated successfully in", opts.out_dir
+			print "\nYour", opts.generate_xml_file_for,".xml file have been generated successfully in", opts.out_dir
 
-		elif opts.xml_file == "experiment":
+		elif opts.generate_xml_file_for == "experiment":
 
-			print "\nYou would like me to generate the", opts.xml_file, ".xml file needed to submit your data to ENA....\nLet me check if you have provided all the necessary information....\n"
+			print "\nYou would like me to generate the", opts.generate_xml_file_for, ".xml file needed to submit your data to ENA....\nLet me check if you have provided all the necessary information....\n"
 
 			check_if_flag_is_provided(opts.dir_of_input_data,"dir_of_input_data","-i")
 			check_if_flag_is_provided(opts.refname,"refname","-r")
@@ -130,11 +130,11 @@ def main():
 
 			populate_data_to_ENA.experiment_xml(opts.dir_of_input_data,opts.data_file,opts.refname,opts.center_name,opts.library_strategy,opts.library_source,opts.library_selection,opts.read_length,opts.read_sdev,opts.instrument_model,opts.out_dir)
 
-			print "\nYour", opts.xml_file,".xml file have been generated successfully in", opts.out_dir
+			print "\nYour", opts.generate_xml_file_for,".xml file have been generated successfully in", opts.out_dir
 
-		elif opts.xml_file == "run":
+		elif opts.generate_xml_file_for == "run":
 
-			print "\nYou would like me to generate the", opts.xml_file, ".xml file needed to submit your data to ENA....\nLet me check if you have provided all the necessary information....\n"
+			print "\nYou would like me to generate the", opts.generate_xml_file_for, ".xml file needed to submit your data to ENA....\nLet me check if you have provided all the necessary information....\n"
 
 			check_if_flag_is_provided(opts.dir_of_input_data,"dir_of_input_data","-i")
 			check_if_flag_is_provided(opts.refname,"refname","-r")
@@ -142,11 +142,11 @@ def main():
 
 			populate_data_to_ENA.run_xml(opts.dir_of_input_data,opts.refname,opts.center_name,opts.filetype,opts.out_dir)
 
-			print "\nYour", opts.xml_file,".xml file have been generated successfully in", opts.out_dir
+			print "\nYour", opts.generate_xml_file_for,".xml file have been generated successfully in", opts.out_dir
 
-		elif opts.xml_file == "study":
+		elif opts.generate_xml_file_for == "study":
 			
-			print "\nYou would like me to generate the", opts.xml_file, ".xml file needed to submit your data to ENA....\nLet me check if you have provided all the necessary information....\n"
+			print "\nYou would like me to generate the", opts.generate_xml_file_for, ".xml file needed to submit your data to ENA....\nLet me check if you have provided all the necessary information....\n"
 
 			check_if_flag_is_provided(opts.refname,"refname","-r")
 			check_if_flag_is_provided(opts.title_and_abstract_file,"title_and_abstract_file","-a")
@@ -155,17 +155,17 @@ def main():
 
 			populate_data_to_ENA.study_xml(opts.title_and_abstract_file,opts.center_name,opts.refname,opts.out_dir)
 
-			print "\nYour", opts.xml_file,".xml file have been generated successfully in", opts.out_dir
+			print "\nYour", opts.generate_xml_file_for,".xml file have been generated successfully in", opts.out_dir
 
-		elif opts.xml_file == "submission":
+		elif opts.generate_xml_file_for == "submission":
 			
-			print "\nYou would like me to generate the", opts.xml_file, ".xml file needed to submit your data to ENA....\nLet me check if you have provided all the necessary information....\n"
+			print "\nYou would like me to generate the", opts.generate_xml_file_for, ".xml file needed to submit your data to ENA....\nLet me check if you have provided all the necessary information....\n"
 
 			check_if_flag_is_provided(opts.refname,"refname","-r")
 			check_if_flag_is_provided(opts.out_dir,"out_dir","-o")
 
 			populate_data_to_ENA.submission_xml(opts.refname,opts.center_name,opts.out_dir,opts.release,opts.hold_date)
 
-			print "\nYour", opts.xml_file,".xml file have been generated successfully in", opts.out_dir
+			print "\nYour", opts.generate_xml_file_for,".xml file have been generated successfully in", opts.out_dir
 
 main()

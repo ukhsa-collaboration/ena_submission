@@ -227,6 +227,7 @@ def create_dict_with_data(dir_of_input_data,refname,data_file, delim="\t", heade
 						cols[indexToName[i]] += [cell]
 						i += 1
 	return cols
+	print cols
 
 def sample_xml(dir_of_input_data,refname,data_file,center_name,out_dir):
 	
@@ -253,18 +254,12 @@ def sample_xml(dir_of_input_data,refname,data_file,center_name,out_dir):
 
 	sample_id_and_data = create_dict_with_data(dir_of_input_data,refname,data_file)
 	# print sample_id_and_data
-	sample_set = ET.Element('SAMPLE_SET')
+	if set(('SAMPLE','TAXON_ID','SCIENTIFIC_NAME','DESCRIPTION')) <= set(sample_id_and_data):
+		sample_set = ET.Element('SAMPLE_SET')
+		sample_scientific_name_description = set(['SAMPLE','TAXON_ID','SCIENTIFIC_NAME','DESCRIPTION'])
+		all_keys_in_a_lits = set(sample_id_and_data.keys())
+		remaining_keys = all_keys_in_a_lits - sample_scientific_name_description
 
-	sample_scientific_name_description = set(['SAMPLE','TAXON_ID','SCIENTIFIC_NAME','DESCRIPTION'])
-
-	all_keys_in_a_lits = set(sample_id_and_data.keys())
-
-	remaining_keys = all_keys_in_a_lits - sample_scientific_name_description
-
-	if "SAMPLE" and "TAXON_ID" and "SCIENTIFIC_NAME" and "DESCRIPTION" not in sample_id_and_data:
-		print "ERROR: The",data_file,"file does not contain a SAMPLE, or a SCIENTIFIC_NAME or a DESCRIPTION field! Please add the relevant field to proceed"
-		sys.exit(1)
-	else:
 		for index,sample_name in enumerate(sample_id_and_data["SAMPLE"]):
 			for key in sample_scientific_name_description:
 				field = []
@@ -298,6 +293,10 @@ def sample_xml(dir_of_input_data,refname,data_file,center_name,out_dir):
 				tag = ET.SubElement(sample_attribute, "TAG").text = str(key)
 				value = ET.SubElement(sample_attribute, "VALUE").text = ''.join(field)
 				# use the indent function to indent the xml file
+	else:
+		print "ERROR: The " + data_file + " file does not contain one of the following fields: SAMPLE, TAXON_ID, SCIENTIFIC_NAME, DESCRIPTION. Please add the relevant field to proceed...."
+		sys.exit(1)
+	# print sample_id_and_data
 	indent(sample_set)
 	# create tree
 	tree = ET.ElementTree(sample_set)
@@ -489,59 +488,59 @@ def study_xml(title_and_abstract_file,center_name,refname,out_dir):
 
 	print "\nSuccessfully created study.xml file\n"
 
-	def submission_xml(refname,center_name,out_dir,release=False,hold_date=''):
+def submission_xml(refname,center_name,out_dir,release=False,hold_date=''):
 
-		'''
-		submission_xml(refname,center_name,out_dir,release,hold_date='')
-		
-		This function generates a submission.xml file needed for submission of data to ENA. It is the final of the five xml files needed.
+	'''
+	submission_xml(refname,center_name,out_dir,release,hold_date='')
+	
+	This function generates a submission.xml file needed for submission of data to ENA. It is the final of the five xml files needed.
 
-		Params
-	    ------
-	    center_name, str : name of the center.  Default is PHE
-	    refname, str: A unique name for the whole submission. This name must not have been used before in any other submission to ENA.
-	    center_project_name, str: provide a centre project name, default = PHE_SCIENTIFIC_PROJECT
-	    release, True or False: If True then the data would be immediatley available publicly.  If FALSE then it would be held for a default of 2 years privately.
-	    hold_date, date: The date to which you like to release your data publicly.  default is two years.
-	    out_dir, str : name of the new xml file
+	Params
+    ------
+    center_name, str : name of the center.  Default is PHE
+    refname, str: A unique name for the whole submission. This name must not have been used before in any other submission to ENA.
+    center_project_name, str: provide a centre project name, default = PHE_SCIENTIFIC_PROJECT
+    release, True or False: If True then the data would be immediatley available publicly.  If FALSE then it would be held for a default of 2 years privately.
+    hold_date, date: The date to which you like to release your data publicly.  default is two years.
+    out_dir, str : name of the new xml file
 
-	    return
-	    ------
+    return
+    ------
 
-	    outfile, file : a submission.xml file needed for ENA submission.
+    outfile, file : a submission.xml file needed for ENA submission.
 
-		'''
+	'''
 
-		xml_files = ["study", "sample", "experiment", "run"]
+	xml_files = ["study", "sample", "experiment", "run"]
 
-		submission_set = ET.Element('SUBMISSION_SET')
-		submission = ET.SubElement(submission_set, 'SUBMISSION', alias=refname, center_name=center_name)
-		actions = ET.SubElement(submission, "ACTIONS")
-		for xml_file in xml_files:
-			action = ET.SubElement(actions, "ACTION")
-			add = ET.SubElement(action, "ADD", source=xml_file+".xml", schema=xml_file)
-
-		# if a hold date is given until releasing publicly
+	submission_set = ET.Element('SUBMISSION_SET')
+	submission = ET.SubElement(submission_set, 'SUBMISSION', alias=refname, center_name=center_name)
+	actions = ET.SubElement(submission, "ACTIONS")
+	for xml_file in xml_files:
 		action = ET.SubElement(actions, "ACTION")
+		add = ET.SubElement(action, "ADD", source=xml_file+".xml", schema=xml_file)
 
-		if hold_date:
-			hold = ET.SubElement(action, "HOLD", HoldUntilDate=hold_date)
-		# else if release is given, i.e. release immediatley to the public
-		elif release:
-			release = ET.SubElement(action, "RELEASE")
-		# otherwise hold for two years and then make it public
-		else:
-			hold = ET.SubElement(action, "HOLD")
-		# use the indent function to indent the xml file
-		indent(submission_set)
-		# create tree
-		tree = ET.ElementTree(submission_set)
+	# if a hold date is given until releasing publicly
+	action = ET.SubElement(actions, "ACTION")
 
-		# out_dirput to outfile
-		with open(out_dir+"/submission.xml", 'w') as outfile:
-			tree.write(outfile, xml_declaration=True, encoding='utf-8', method="xml")
+	if hold_date:
+		hold = ET.SubElement(action, "HOLD", HoldUntilDate=hold_date)
+	# else if release is given, i.e. release immediatley to the public
+	elif release:
+		release = ET.SubElement(action, "RELEASE")
+	# otherwise hold for two years and then make it public
+	else:
+		hold = ET.SubElement(action, "HOLD")
+	# use the indent function to indent the xml file
+	indent(submission_set)
+	# create tree
+	tree = ET.ElementTree(submission_set)
 
-		print "\nSuccessfully created submission.xml file\n"
+	# out_dirput to outfile
+	with open(out_dir+"/submission.xml", 'w') as outfile:
+		tree.write(outfile, xml_declaration=True, encoding='utf-8', method="xml")
+
+	print "\nSuccessfully created submission.xml file\n"
 
 def run_curl_command(ftp_user_name,ftp_password,out):
 
