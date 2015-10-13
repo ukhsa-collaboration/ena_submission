@@ -22,30 +22,30 @@ This tool in a single step will create the necessary xml files and uploads all y
 
   To upload your files to ENA, you will need the following:
 
-  1- A directory which contains all your files (fwd and rev).  If you are uploading fastq files, the files must be in the following format:
+    1- A directory which contains all your files (fwd and rev).  If you are uploading fastq files, the files must be in the following format:
 
-  SAMPLE_NAME.whatever_you_like.R1.fastq.gz
-  SAMPLE_NAME.whatever_you_like.R2.fastq.gz
+      SAMPLE_NAME.whatever_you_like.R1.fastq.gz
+      SAMPLE_NAME.whatever_you_like.R2.fastq.gz
 
-  E.g. 
+      E.g. 
 
-  MN127.processed.R1.fastq.gz
-  MN127.processed.R2.fastq.gz
+      MN127.processed.R1.fastq.gz
+      MN127.processed.R2.fastq.gz
 
-  Otherwise, if you are uploading a different type of file, like bam files or fasta files, you can name them whatever you like but they should have the prefix at the end, e.g. .bam or .fasta
+      Otherwise, if you are uploading a different type of file, like bam files or fasta files, you can name them whatever you like but they should have the prefix at the end, e.g. .bam or .fasta
 
-  2- A csv (comma separated values) file that contains all the information for each of your samples.  The text file should contain four required columns.  You may add as many coloumns of data as you wish after the fourth required coloumn.  The columns are separated by commas.  e.g. (note the headings are required as seen below):
-  SAMPLE,TAXON_ID,SCIENTIFIC_NAME,DESCRIPTION
+    2- A csv (comma separated values) file that contains all the information for each of your samples.  The text file should contain four required columns.  You may add as many coloumns of data as you wish after the fourth required coloumn.  The columns are separated by commas.  e.g. (note the headings are required as seen below):
+      SAMPLE,TAXON_ID,SCIENTIFIC_NAME,DESCRIPTION
 
-  data....
+      data....
 
-  See a template file in the examples dir.
+      See a template file in the examples dir.
 
-  3- A text file that contains the title for your project and an abstract explaining the project.  The two coloumns must be separated by tabs. There are no headings needed here. e.g.
+    3- A text file that contains the title for your project and an abstract explaining the project.  The two coloumns must be separated by tabs. There are no headings needed here. e.g.
 
-  Bioinformatics for biologists \t Bioinformatics is great for biologists.....etc
+      Bioinformatics for biologists \t Bioinformatics is great for biologists.....etc
 
-  4- An ENA ftp username and password.  If you do not have one, you need to contact ENA at: datasubs@ebi.ac.uk.
+    4- An ENA ftp username and password.  If you do not have one, you need to contact ENA at: datasubs@ebi.ac.uk.
 
   NOTE!! If you are uploading files other than fastq files, you must use the -F flag and add the prefix, e.g. -F bam.
 
