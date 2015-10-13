@@ -34,7 +34,7 @@ def check_file_exists(filepath, file_description):
 		print("The " + file_description + " (" + filepath + ") does not exist")
 		sys.exit(1)
 
-def create_checksums_file(dir_of_input_data,refname):
+def create_checksums_file(dir_of_input_data,refname,filetype):
 
 	'''
 	create_checksums_file(dir_of_input_data,refname)
@@ -52,24 +52,35 @@ def create_checksums_file(dir_of_input_data,refname):
     checksums_file, file : a checksum file will be created in the dir_of_input_data directory.  It would be called: refname_"checksums.md5".
 
 	'''
-
-	files = glob.glob(dir_of_input_data+"/"+"*.R1.fastq.gz")
-
 	checksums_file = open(dir_of_input_data+'/'+refname+'_checksums.md5', "w")
 
-	for file in files:
-		(SeqDir,seqFileName_R1) = os.path.split(file)
-		# get the sample name.  filenames must be in the following format: sample_name.processed.R1.fastq.gz
-		sample_name = seqFileName_R1.split('.')[0]
-		read_2_file = ''.join(glob.glob(SeqDir+"/"+sample_name+"*.R2.fastq.gz"))
-		print "creating checksums for", sample_name
-		checksum_read1 = hashlib.md5(open(file, 'rb').read()).hexdigest()
-		checksum_read2 = hashlib.md5(open(read_2_file, 'rb').read()).hexdigest()
-		(SeqDir,seqFileName_R2) = os.path.split(read_2_file)
-		checksums_file.write(checksum_read1+" "+seqFileName_R1+"\n")
-		checksums_file.write(checksum_read2+" "+seqFileName_R2+"\n")
+	try:
+		if filetype == "fastq":
+			files = glob.glob(dir_of_input_data+"/"+"*.R1.fastq.gz")
+		else:
+			files = glob.glob(dir_of_input_data+"/"+"*."+filetype)
 
-def upload_data_to_ena_ftp_server(dir_of_input_data,refname,ftp_user_name,ftp_password):
+		if not files:
+			print "There's something wrong with "+dir_of_input_data+". Note: if you are uploading other than fastq files please use the -F option to specify the prefix of your files, e.g. -F bam."
+			sys.exit()
+		print "creating checksums....."
+		for file in files:
+			(SeqDir,seqFileName_R1) = os.path.split(file)
+			# get the sample name.  filenames must be in the following format: sample_name.processed.R1.fastq.gz
+			sample_name = seqFileName_R1.split('.')[0]
+			checksum_main = hashlib.md5(open(file, 'rb').read()).hexdigest()
+			checksums_file.write(checksum_main+" "+seqFileName_R1+"\n")
+			if filetype == "fastq":
+				read_2_file = ''.join(glob.glob(SeqDir+"/"+sample_name+"*.R2.fastq.gz"))
+				checksum_read2 = hashlib.md5(open(read_2_file, 'rb').read()).hexdigest()
+				(SeqDir,seqFileName_R2) = os.path.split(read_2_file)
+				checksums_file.write(checksum_read2+" "+seqFileName_R2+"\n")
+		print "created checksums file.  It's located in "+dir_of_input_data+'/'+refname+'_checksums.md5'
+	except IOError:
+		print "ERROR: Something has gone wrong with creating the checksums file.  Please check and re-submit."
+		sys.exit()
+
+def upload_data_to_ena_ftp_server(dir_of_input_data,refname,ftp_user_name,ftp_password,filetype):
 
 	'''
 	upload_data_to_ena_ftp_server(dir_of_input_data,refname,ftp_user_name,ftp_password)
@@ -116,13 +127,16 @@ def upload_data_to_ena_ftp_server(dir_of_input_data,refname,ftp_user_name,ftp_pa
 		ftp.storbinary('STOR '+refname+'_checksums.md5', checksum_file)     # send the file
 		checksum_file.close()
 	except IOError:
-		print "ERROR: could not find the checksum file.  I'm looking at",dir_of_input_data+'/'+refname+'_checksums.md5'
+		print "ERROR: could not find the checksum file.  I'm looking for",dir_of_input_data+'/'+refname+'_checksums.md5'
 		sys.exit()
 	
 	print "\nNow uploading all the data to ENA ftp server in the", refname, "directory\n"
 
-	files = glob.glob(dir_of_input_data+"/"+"*.fastq.gz")
 	try:
+		if filetype == "fastq":
+			files = glob.glob(dir_of_input_data+"/"+"*.fastq.gz")
+		else:
+			files = glob.glob(dir_of_input_data+"/"+"*."+filetype)
 		for file in files:
 			(SeqDir,seqFileName) = os.path.split(file)
 			print "\nuploading", file, "to ENA ftp server.....\n"
@@ -177,7 +191,7 @@ def create_dict_with_data(dir_of_input_data,refname,data_file, delim="\t", heade
 	------
 	dir_of_input_data, dir: This is the directory that contains all the files to be uploaded to ENA.  NOTE: the fastq files must be in the following format: *.R1.fastq.gz and *.R2.fastq.gz.
 	refname, str: You must provide a reference name for your study, e.g. phe_ecoli
-	data_file, file : this text file must have at least three columns seperated by tabs in the following order and with the following headings:  Column 1: SAMPLE, Column 2: TAXON_ID, Column 3: SCIENTIFIC_NAME, Column 4: DESCRIPTION.  If you like to add further data then add it after the DESCRIPTION column.
+	data_file, file : this csv file must have at least three columns seperated by commas in the following order and with the following headings:  Column 1: SAMPLE, Column 2: TAXON_ID, Column 3: SCIENTIFIC_NAME, Column 4: DESCRIPTION.  If you like to add further data then add it after the DESCRIPTION column.
 	header, True or False :  if True the first line will be considered a header line
 
 
@@ -205,7 +219,7 @@ def create_dict_with_data(dir_of_input_data,refname,data_file, delim="\t", heade
 
 	for lineNum, line in enumerate(meta_data_file):
 		if lineNum == 0:
-			headings = line.split(delim)
+			headings = line.split(',')
 			i = 0
 			for heading in headings:
 				heading = heading.strip()
@@ -218,7 +232,7 @@ def create_dict_with_data(dir_of_input_data,refname,data_file, delim="\t", heade
 					indexToName[i] = i
 				i += 1
 		else:
-			cells = line.split(delim)
+			cells = line.split(',')
 			i = 0
 			for strain in strain_names:
 				if strain in cells[0]:
@@ -239,7 +253,7 @@ def sample_xml(dir_of_input_data,refname,data_file,center_name,out_dir):
 	Params
     ------
     dir_of_input_data, dir: This is the directory that contains all the files to be uploaded to ENA.
-    data_file, file : this text file must have at least three columns seperated by tabs in the following order and with the following headings:  Column 1: SAMPLE, Column 2: TAXON_ID, Column 3: SCIENTIFIC_NAME, Column 4: DESCRIPTION.  If you like to add further data then add it after the DESCRIPTION column.
+    data_file, file : this text file must have at least three columns seperated by commas in the following order and with the following headings:  Column 1: SAMPLE, Column 2: TAXON_ID, Column 3: SCIENTIFIC_NAME, Column 4: DESCRIPTION.  If you like to add further data then add it after the DESCRIPTION column.
     refname, str: You must provide a reference name for your study, e.g. phe_ecoli
     center_name, str : name of the center, e.g. PHE
     taxon_id, str : the taxon id of the organism from NCBI
@@ -316,7 +330,7 @@ def experiment_xml(dir_of_input_data,data_file,refname,center_name,library_strat
 	Params
 	------
 	dir_of_input_data, dir: This is the directory that contains all the files to be uploaded to ENA.
-	data_file, file : this text file must have at least three columns seperated by tabs in the following order and with the following headings:  Column 1: SAMPLE, Column 2: TAXON_ID, Column 3: SCIENTIFIC_NAME, Column 4: DESCRIPTION.  If you like to add further data then add it after the DESCRIPTION column.
+	data_file, file : this text file must have at least three columns seperated by commas in the following order and with the following headings:  Column 1: SAMPLE, Column 2: TAXON_ID, Column 3: SCIENTIFIC_NAME, Column 4: DESCRIPTION.  If you like to add further data then add it after the DESCRIPTION column.
     center_name, str : name of the center, e.g. PHE
     refname, str: A unique name for the whole submission. This name must not have been used before in any other submission to ENA.
     library_strategy, str : default 'WGS'.
@@ -565,7 +579,7 @@ def run_curl_command(ftp_user_name,ftp_password,out):
 	# first do a test...
 
 	test_cmd = "curl -k -F \"SUBMISSION=@submission.xml\" -F \"STUDY=@study.xml\" -F \"SAMPLE=@sample.xml\" -F \"EXPERIMENT=@experiment.xml\" -F \"RUN=@run.xml\" \"https://www-test.ebi.ac.uk/ena/submit/drop-box/submit/?auth=ENA%20\"" + ftp_user_name + "%20" + ftp_password
-	prod_cmd = "curl -k -F \"SUBMISSION=@submission.xml\" -F \"STUDY=@study.xml\" -F \"SAMPLE=@sample.xml\" -F \"EXPERIMENT=@experiment.xml\" -F \"RUN=@run.xml\" \"https://www.ebi.ac.uk/ena/submit/drop-box/submit/?auth=ENA%20\"" + ftp_user_name + "%20" + ftp_password
+	prod_cmd = "\ncurl -k -F \"SUBMISSION=@submission.xml\" -F \"STUDY=@study.xml\" -F \"SAMPLE=@sample.xml\" -F \"EXPERIMENT=@experiment.xml\" -F \"RUN=@run.xml\" \"https://www.ebi.ac.uk/ena/submit/drop-box/submit/?auth=ENA%20\"" + ftp_user_name + "%20" + ftp_password
 	
 	# p = subprocess.Popen(cmd, stdout=subprocess.PIPE, cwd=out, shell=True)
 	receipt_xml = open(out+"/receipt.xml", 'w')
@@ -576,8 +590,10 @@ def run_curl_command(ftp_user_name,ftp_password,out):
 	if "success=\"false\"" in open(out+"/receipt.xml").read():
 		print "\nERROR: There is a problem with the submission.  Please check the receipt.xml file in", out+"/receipt.xml", "and correct the error and re-submit using the -curl command.\n"
 		sys.exit()
+	# elif "success=\"true\"" in open(out+"/receipt.xml").read():
+	# 	print "\nTest submission is successfull!"
+	# 	print "\nSubmitting production now..."
+	# 	p = subprocess.Popen(prod_cmd, stdout=receipt_xml, cwd=out, shell=True)
+	# 	(curl_output, err) = p.communicate()
 	elif "success=\"true\"" in open(out+"/receipt.xml").read():
-		print "\nTest submission is successfull!"
-		print "\nSubmitting production now..."
-		p = subprocess.Popen(prod_cmd, stdout=receipt_xml, cwd=out, shell=True)
-		(curl_output, err) = p.communicate()
+		print "SUCCESS! Your data is now ready to be uploaded to production.  Note that if you decide to upload your data to production then it would be very difficult to delete it.  So if you are happy with this then run the following command: "+prod_cmd
