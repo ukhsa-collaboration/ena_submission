@@ -143,24 +143,24 @@ Usage
 -----
 
   ena_submission.py [-h] 
-    [--generate_xml_file_for GENERATE_XML_FILE_FOR]
-    [--dir_of_input_data DIR_OF_INPUT_DATA]
-    [--data_file DATA_FILE]
-    [--ftp_user_name FTP_USER_NAME]
-    [--ftp_password FTP_PASSWORD]
-    [--title_and_abstract_file TITLE_AND_ABSTRACT_FILE]
-    [--center_name CENTER_NAME] [--refname REFNAME]
-    [--library_strategy LIBRARY_STRATEGY]
-    [--library_source LIBRARY_SOURCE]
-    [--library_selection LIBRARY_SELECTION]
-    [--read_length READ_LENGTH] [--read_sdev READ_SDEV]
-    [--instrument_model INSTRUMENT_MODEL]
-    [--filetype FILETYPE] [--hold_date HOLD_DATE]
-    [--release] [--curl_command]
-    [--create_checksums_file]
-    [--upload_data_to_ena_ftp_server] [--out_dir OUT_DIR]
+      [--generate_xml_file_for GENERATE_XML_FILE_FOR]
+      [--dir_of_input_data DIR_OF_INPUT_DATA]
+      [--data_file DATA_FILE]
+      [--ftp_user_name FTP_USER_NAME]
+      [--ftp_password FTP_PASSWORD]
+      [--title_and_abstract_file TITLE_AND_ABSTRACT_FILE]
+      [--center_name CENTER_NAME] [--refname REFNAME]
+      [--library_strategy LIBRARY_STRATEGY]
+      [--library_source LIBRARY_SOURCE]
+      [--library_selection LIBRARY_SELECTION]
+      [--read_length READ_LENGTH] [--read_sdev READ_SDEV]
+      [--instrument_model INSTRUMENT_MODEL]
+      [--filetype FILETYPE] [--hold_date HOLD_DATE]
+      [--release] [--curl_command]
+      [--create_checksums_file]
+      [--upload_data_to_ena_ftp_server] [--out_dir OUT_DIR]
 
-  arguments:
+  Arguments:
 
     -h, --help            show this help message and exit
     --generate_xml_file_for GENERATE_XML_FILE_FOR, -x GENERATE_XML_FILE_FOR
