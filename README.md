@@ -27,16 +27,19 @@ To upload your files to ENA, you will need the following:
 1. A directory which contains all your files.  If you are uploading fastq files, the files must be in the following format:
 
   SAMPLE_NAME.whatever_you_like.R1.fastq.gz
+
   SAMPLE_NAME.whatever_you_like.R2.fastq.gz
 
   E.g. 
 
   MN127.processed.R1.fastq.gz
+  
   MN127.processed.R2.fastq.gz
 
   Otherwise, if you are uploading a different type of file, like bam files or fasta files, you can name them whatever you like but they should have the prefix at the end, e.g. .bam or .fasta
 
 2. A csv (comma separated values) file that contains all the information for each of your samples.  The text file should contain four required columns.  You may add as many coloumns of data as you wish after the fourth required coloumn.  The columns are separated by commas.  e.g. (note the headings are required as seen below):
+
 
   SAMPLE,TAXON_ID,SCIENTIFIC_NAME,DESCRIPTION
 
