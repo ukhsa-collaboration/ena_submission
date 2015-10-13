@@ -24,7 +24,7 @@ Python >= 2.7
 
 To upload your files to ENA, you will need the following:
 
-1. A directory which contains all your files (fwd and rev).  If you are uploading fastq files, the files must be in the following format:
+1. A directory which contains all your files.  If you are uploading fastq files, the files must be in the following format:
 
   SAMPLE_NAME.whatever_you_like.R1.fastq.gz
   SAMPLE_NAME.whatever_you_like.R2.fastq.gz
@@ -37,6 +37,7 @@ To upload your files to ENA, you will need the following:
   Otherwise, if you are uploading a different type of file, like bam files or fasta files, you can name them whatever you like but they should have the prefix at the end, e.g. .bam or .fasta
 
 2. A csv (comma separated values) file that contains all the information for each of your samples.  The text file should contain four required columns.  You may add as many coloumns of data as you wish after the fourth required coloumn.  The columns are separated by commas.  e.g. (note the headings are required as seen below):
+
   SAMPLE,TAXON_ID,SCIENTIFIC_NAME,DESCRIPTION
 
   data....
@@ -64,7 +65,7 @@ Before you run the script, make sure you have the following ready as you cannot 
     -user : ENA username
     -pass : ENA password
 
-Now, familarise yourself with the other options you can use in the steps
+You should familarise yourself with the other options before you begin running the script.
 
 
 ## Examples of commands
