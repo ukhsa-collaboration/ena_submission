@@ -24,7 +24,7 @@ Python >= 2.7
 
 To upload your files to ENA, you will need the following:
 
-1. A directory which contains all your files.  If you are uploading fastq files, the files must be in the following format:
+1. A directory which contains all your files.  If you are uploading fastq files, the files must be in the following format (see examples in the examples folder):
 
   SAMPLE_NAME.whatever_you_like.R1.fastq.gz
 
@@ -47,7 +47,7 @@ To upload your files to ENA, you will need the following:
 
   You may like to use the template file provided in the examples folder.  You might also like to see an example file in the examples folder.
 
-3. A text file that contains the title for your project and an abstract explaining the project.  The two coloumns must be separated by tabs. There are no headings needed here. e.g.
+3. A text file that contains the title for your project and an abstract explaining the project.  The two coloumns must be separated by tabs. There are no headings needed here. e.g (see examples in the examples folder):
 
   Bioinformatics for biologists \t Bioinformatics is great for biologists.....etc
 
@@ -78,7 +78,7 @@ You should familarise yourself with the other options before you begin running t
 
   E.g. for fastq submission (otherwise use -F prefix_name)
 
-    python ena_submission.py -x all -i /SOME/PATH/fastqs -r phe_mycoplasma -f /SOME/PATH/data_file_for_ena_submission.txt -o /SOME/PATH/ena_submission -a /SOME/PATH/title_and_abstract_for_ena.txt -user Webin-40432 -pass XXXXX
+    python ena_submission.py -x all -i /SOME/PATH/files_to_upload -r phe_mycoplasma -f /SOME/PATH/data_file_for_ena_submission.txt -o /SOME/PATH/ena_submission -a /SOME/PATH/title_and_abstract_for_ena.txt -user Webin-YYYYY -pass XXXXX
 
   You may wish to run each step individually. These are the different steps you may run manually:
 
@@ -88,7 +88,7 @@ You should familarise yourself with the other options before you begin running t
 
   --create_checksums_file : only create the checksums file for my fastqs. e.g.
 
-    python ena_submission.py -cs -i /SOME/PATH/fastqs -r test3
+    python ena_submission.py -cs -i /SOME/PATH/files_to_upload -r test3
 
   ----
 
@@ -96,7 +96,7 @@ You should familarise yourself with the other options before you begin running t
 
   --upload_data_to_ena_ftp_server : only upload the data to ENA. e.g.
 
-    python ena_submission.py -ftp -i /SOME/PATH/fastqs -r phe_mycoplasma -user Webin-YYYYY -pass XXXXX
+    python ena_submission.py -ftp -i /SOME/PATH/files_to_upload -r phe_mycoplasma -user Webin-YYYYY -pass XXXXX
 
   ----
 
@@ -104,27 +104,27 @@ You should familarise yourself with the other options before you begin running t
 
   -x sample : use the word 'sample' (same goes for the rest) to create sample.xml only. e.g.
 
-    python ena_submission.py -x sample -i /SOME/PATH/fastqs -r phe_mycoplasma -f /SOME/PATH/data_file_for_ena_submission.txt -o /SOME/PATH/ena_submission
+    python ena_submission.py -x sample -i /SOME/PATH/files_to_upload -r phe_mycoplasma -f /SOME/PATH/data_file_for_ena_submission.txt -o /SOME/PATH/ena_submission
 
   ----
   To just create experiment.xml file:
 
   -x experiment : to create experiment.xml only. e.g.
 
-    python ena_submission.py -x experiment -i /SOME/PATH/fastqs -r phe_mycoplasma -f /SOME/PATH/data_file_for_ena_submission.txt -o /SOME/PATH/ena_submission  
+    python ena_submission.py -x experiment -i /SOME/PATH/files_to_upload -r phe_mycoplasma -f /SOME/PATH/data_file_for_ena_submission.txt -o /SOME/PATH/ena_submission  
   ----
 
   To just create run.xml file:
 
   -x run : to create run.xml only. e.g.
 
-    python ena_submission.py -x run -i /SOME/PATH/fastqs -r phe_mycoplasma -o /SOME/PATH/ena_submission
+    python ena_submission.py -x run -i /SOME/PATH/files_to_upload -r phe_mycoplasma -o /SOME/PATH/ena_submission
   ----
 
   To just create study.xml file:
   -x study : to create study.xml only. e.g.
 
-    python ena_submission.py -x study -a /SOME/PATH/title_and_abstract_for_ena.txt -r phe_mycoplasma -i /SOME/PATH/fastqs -o /SOME/PATH/ena_submission
+    python ena_submission.py -x study -a /SOME/PATH/title_and_abstract_for_ena.txt -r phe_mycoplasma -i /SOME/PATH/files_to_upload -o /SOME/PATH/ena_submission
 
   ----
 
@@ -132,7 +132,7 @@ You should familarise yourself with the other options before you begin running t
 
   -x submission : to create submission.xml only. e.g.
 
-    python ena_submission.py -x submission -i /SOME/PATH/fastqs -o /SOME/PATH/ena_submission -r phe_mycoplasma
+    python ena_submission.py -x submission -i /SOME/PATH/files_to_upload -o /SOME/PATH/ena_submission -r phe_mycoplasma
 
   NOTE: Here you may hold your data from release publicly if you use -ho option and specify the date.
   ----

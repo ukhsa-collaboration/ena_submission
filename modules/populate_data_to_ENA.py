@@ -113,9 +113,9 @@ def upload_data_to_ena_ftp_server(dir_of_input_data,refname,ftp_user_name,ftp_pa
 
 	try:
 		if refname in ftp.nlst() :
-			print refname, "directory already exists....OK no problem..."
+			print refname, "directory in ftp already exists....OK no problem..."
 		else:
-			print "\nmaking new directory called\n", refname
+			print "\nmaking new directory in ftp called", refname
 			ftp.mkd(str(refname))
 			ftp.cwd(str(refname))
 		
@@ -130,7 +130,7 @@ def upload_data_to_ena_ftp_server(dir_of_input_data,refname,ftp_user_name,ftp_pa
 		print "ERROR: could not find the checksum file.  I'm looking for",dir_of_input_data+'/'+refname+'_checksums.md5'
 		sys.exit()
 	
-	print "\nNow uploading all the data to ENA ftp server in the", refname, "directory\n"
+	print "Now uploading all the data to ENA ftp server in the", refname, "directory\n"
 
 	try:
 		if filetype == "fastq":

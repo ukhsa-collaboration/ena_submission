@@ -244,6 +244,7 @@ def main(opts):
 			check_if_flag_is_provided(opts.ftp_user_name, "ftp_user_name", "-user")
 			check_if_flag_is_provided(opts.ftp_password, "ftp_password", "pass")
 			check_if_flag_is_provided(opts.dir_of_input_data,"dir_of_input_data","-i")
+			check_if_flag_is_provided(opts.center_name,"center_name","-c")
 			check_if_flag_is_provided(opts.refname,"refname","-r")
 			check_if_flag_is_provided(opts.data_file,"data_file","-f")
 			check_if_flag_is_provided(opts.title_and_abstract_file,"title_and_abstract_file","-a")
@@ -264,6 +265,7 @@ def main(opts):
 			populate_data_to_ENA.run_curl_command(opts.ftp_user_name,opts.ftp_password,opts.out_dir)
 
 			print "All done...please check if all the files have been uploaded to ENA."
+			# print "All done...please check if all the files have been uploaded to ENA."
 
 		elif opts.generate_xml_file_for == "sample":
 
@@ -271,6 +273,7 @@ def main(opts):
 
 			check_if_flag_is_provided(opts.dir_of_input_data,"dir_of_input_data","-i")
 			check_if_flag_is_provided(opts.refname,"refname","-r")
+			check_if_flag_is_provided(opts.center_name,"center_name","-c")
 			check_if_flag_is_provided(opts.data_file,"data_file","-f")
 			check_if_flag_is_provided(opts.out_dir,"out_dir","-o")	
 
@@ -284,6 +287,7 @@ def main(opts):
 
 			check_if_flag_is_provided(opts.dir_of_input_data,"dir_of_input_data","-i")
 			check_if_flag_is_provided(opts.refname,"refname","-r")
+			check_if_flag_is_provided(opts.center_name,"center_name","-c")
 			check_if_flag_is_provided(opts.data_file,"data_file","-f")
 			check_if_flag_is_provided(opts.out_dir,"out_dir","-o")
 
@@ -297,6 +301,7 @@ def main(opts):
 
 			check_if_flag_is_provided(opts.dir_of_input_data,"dir_of_input_data","-i")
 			check_if_flag_is_provided(opts.refname,"refname","-r")
+			check_if_flag_is_provided(opts.center_name,"center_name","-c")
 			check_if_flag_is_provided(opts.out_dir,"out_dir","-o")
 
 			populate_data_to_ENA.run_xml(opts.dir_of_input_data,opts.refname,opts.center_name,opts.filetype,opts.out_dir)
@@ -308,6 +313,7 @@ def main(opts):
 			print "\nYou would like me to generate the", opts.generate_xml_file_for, ".xml file needed to submit your data to ENA....\nLet me check if you have provided all the necessary information....\n"
 
 			check_if_flag_is_provided(opts.refname,"refname","-r")
+			check_if_flag_is_provided(opts.center_name,"center_name","-c")
 			check_if_flag_is_provided(opts.title_and_abstract_file,"title_and_abstract_file","-a")
 			check_if_flag_is_provided(opts.out_dir,"out_dir","-o")
 
@@ -320,6 +326,7 @@ def main(opts):
 			print "\nYou would like me to generate the", opts.generate_xml_file_for, ".xml file needed to submit your data to ENA....\nLet me check if you have provided all the necessary information....\n"
 
 			check_if_flag_is_provided(opts.refname,"refname","-r")
+			check_if_flag_is_provided(opts.center_name,"center_name","-c")
 			check_if_flag_is_provided(opts.out_dir,"out_dir","-o")
 
 			populate_data_to_ENA.submission_xml(opts.refname,opts.center_name,opts.out_dir,opts.release,opts.hold_date)

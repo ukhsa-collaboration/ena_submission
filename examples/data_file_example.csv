@@ -1,2 +1,21 @@
-SAMPLE,TAXON_ID,SCIENTIFIC_NAME,DESCRIPTION
-
+SAMPLE,TAXON_ID,SCIENTIFIC_NAME,DESCRIPTION,Year_isolated,Isolation_site
+ENA_TEST,2104,Mycoplasma pneumoniae,,1978,Italy
+ENA_TEST2,2104,Mycoplasma pneumoniae,,1978,France
+ENA_TEST3,2104,Mycoplasma pneumoniae,,1980,France
+ENA_TEST4,2104,Mycoplasma pneumoniae,,1971,UK
+ENA_TEST5,2104,Mycoplasma pneumoniae,,1977,UK
+ENA_TEST6,2104,Mycoplasma pneumoniae,,2000,UK
+ENA_TEST7,2104,Mycoplasma pneumoniae,,1972,Poland
+ENA_TEST8,2104,Mycoplasma pneumoniae,,1973,Germany
+ENA_TEST9,2104,Mycoplasma pneumoniae,,1974,France
+ENA_TEST10,2104,Mycoplasma pneumoniae,,1975,Poland
+ENA_TEST11,2104,Mycoplasma pneumoniae,,1975,Poland
+ENA_TEST12,2104,Mycoplasma pneumoniae,,1976,Poland
+ENA_TEST13,2104,Mycoplasma pneumoniae,,1974,Italy
+ENA_TEST14,2104,Mycoplasma pneumoniae,,1973,Italy
+ENA_TEST15,2104,Mycoplasma pneumoniae,,1972,Germany
+ENA_TEST16,2104,Mycoplasma pneumoniae,,1978,Germany
+ENA_TEST17,2104,Mycoplasma pneumoniae,,1978,UK
+ENA_TEST18,2104,Mycoplasma pneumoniae,,1978,Poland
+ENA_TEST19,2104,Mycoplasma pneumoniae,,1972,UK
+ENA_TEST20,2104,Mycoplasma pneumoniae,,1971,UK
