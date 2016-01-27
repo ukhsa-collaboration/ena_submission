@@ -71,7 +71,7 @@ def set_up_argparse():
 
 	See a template file in the examples dir.|n
 
-	3- A text file that contains the title for your project and an abstract explaining the project.  The two coloumns must be separated by tabs. There are no headings needed here. e.g.|n
+	3- A text file that contains the title for your project and an abstract explaining the project.  The two coloumns must be separated by TABS. There are no headings needed here. e.g.|n
 
 	Bioinformatics for biologists \t Bioinformatics is great for biologists.....etc|n
 
@@ -106,7 +106,7 @@ def set_up_argparse():
 
 	E.g. for fastq submission (otherwise use -F suffix)|n
 
-	    python ena_submission.py -x all -i /SOME/PATH/fastqs -r phe_mycoplasma -f /SOME/PATH/data_file_for_ena_submission.txt -o /SOME/PATH/ena_submission -a /SOME/PATH/title_and_abstract_for_ena.txt -user Webin-YYYYY -pass XXXXX|n
+	    python ena_submission.py -x all -i /PATH/TO/SAMPLES_FILES_DIR -r phe_mycoplasma -f /PATH/TO/DATA_FILE.txt -o /PATH/TO/OUTPUT_DIR -a /PATH/TO/TITLE_ABSTRACT_FILE.txt -c CENTRE_NAME -user Webin-YYYYY -pass XXXXX|n
 
 	
 	Or you may wish to run each step individually. The following are examples of how to run each step individually:|n
@@ -130,27 +130,27 @@ def set_up_argparse():
 
 	  -x sample : use the word 'sample' (same goes for the rest) to create sample.xml only. e.g.|n
 
-	    python ena_submission.py -x sample -i /SOME/PATH/fastqs -r phe_mycoplasma -f /SOME/PATH/data_file_for_ena_submission.txt -o /SOME/PATH/ena_submission|n
+	    python ena_submission.py -x sample -i /SOME/PATH/fastqs -r phe_mycoplasma -f /SOME/PATH/data_file_for_ena_submission.txt -c CENTRE_NAME -o /SOME/PATH/ena_submission|n
 
 	----|n
 	To just create experiment.xml file:|n
 
 	  -x experiment : to create experiment.xml only. e.g.|n
 
-	    python ena_submission.py -x experiment -i /SOME/PATH/fastqs -r phe_mycoplasma -f /SOME/PATH/data_file_for_ena_submission.txt -o /SOME/PATH/ena_submission  |n
+	    python ena_submission.py -x experiment -i /SOME/PATH/fastqs -r phe_mycoplasma -f /SOME/PATH/data_file_for_ena_submission.txt -c CENTRE_NAME -o /SOME/PATH/ena_submission  |n
 	----|n
 
 	To just create run.xml file:|n
 
 	  -x run : to create run.xml only. e.g.|n
 
-	    python ena_submission.py -x run -i /SOME/PATH/fastqs -r phe_mycoplasma -o /SOME/PATH/ena_submission|n
+	    python ena_submission.py -x run -i /SOME/PATH/fastqs -r phe_mycoplasma -c CENTRE_NAME -o /SOME/PATH/ena_submission|n
 	----|n
 
 	To just create study.xml file:|n
 	  -x study : to create study.xml only. e.g.|n
 
-	    python ena_submission.py -x study -a /SOME/PATH/title_and_abstract_for_ena.txt -r phe_mycoplasma -i /SOME/PATH/fastqs -o /SOME/PATH/ena_submission|n
+	    python ena_submission.py -x study -a /SOME/PATH/title_and_abstract_for_ena.txt -r phe_mycoplasma -i /SOME/PATH/fastqs -c CENTRE_NAME -o /SOME/PATH/ena_submission|n
 
 	----|n
 
@@ -158,7 +158,7 @@ def set_up_argparse():
 
 	  -x submission : to create submission.xml only. e.g.|n
 
-	    python ena_submission.py -x submission -i /SOME/PATH/fastqs -o /SOME/PATH/ena_submission -r phe_mycoplasma|n
+	    python ena_submission.py -x submission -i /SOME/PATH/fastqs -o /SOME/PATH/ena_submission -r phe_mycoplasma -c CENTRE_NAME |n
 
 	  NOTE: Here you may hold your data from release publicly if you use -ho option and specify the date.|n
 

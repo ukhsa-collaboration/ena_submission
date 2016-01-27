@@ -61,7 +61,7 @@ def create_checksums_file(dir_of_input_data,refname,filetype):
 			files = glob.glob(dir_of_input_data+"/"+"*."+filetype)
 
 		if not files:
-			print "There's something wrong with "+dir_of_input_data+". Note: if you are uploading other than fastq files please use the -F option to specify the prefix of your files, e.g. -F bam."
+			print "The files in "+dir_of_input_data+" do not match the prefix.  Please check and try again. Note: if you are uploading other than fastq files please use the -F option to specify the prefix of your files, e.g. -F bam."
 			sys.exit()
 		print "creating checksums....."
 		for file in files:
@@ -139,7 +139,7 @@ def upload_data_to_ena_ftp_server(dir_of_input_data,refname,ftp_user_name,ftp_pa
 			files = glob.glob(dir_of_input_data+"/"+"*."+filetype)
 		for file in files:
 			(SeqDir,seqFileName) = os.path.split(file)
-			print "\nuploading", file, "to ENA ftp server.....\n"
+			print "uploading", file, "to ENA ftp server.....\n"
 			ftp.storbinary('STOR '+seqFileName, open(file, 'rb'))
 	except IOError:
 		print "Oops! something has gone wrong while uploading data to the ENA ftp server!"
@@ -596,4 +596,6 @@ def run_curl_command(ftp_user_name,ftp_password,out):
 	# 	p = subprocess.Popen(prod_cmd, stdout=receipt_xml, cwd=out, shell=True)
 	# 	(curl_output, err) = p.communicate()
 	elif "success=\"true\"" in open(out+"/receipt.xml").read():
-		print "SUCCESS! Your data is now ready to be uploaded to production.  Note that if you decide to upload your data to production then it would be very difficult to delete it.  So if you are happy with this then run the following command: "+prod_cmd
+		print "\nSUCCESS! Your data is now ready to be uploaded to production.  Note that if you decide to upload your data to production then it would be very difficult to delete it.  So if you are happy with this then run the following command:\n "+prod_cmd
+
+		print "\n NOTE: you must run the above curl command from the output dir which contains all the xml files."
