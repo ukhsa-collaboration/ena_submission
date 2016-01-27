@@ -10,12 +10,12 @@ In order to submit your files as a batch to ENA, you need to create some files t
 
 1. Creates a checksum file of all your files needed for submission.
 2. Uploads the files to the ENA server using FTP.  It will use the authentications you have provided it.
-3. Provided the data that you have provided is correct, the script will create five xml files: sample.xml, experiment.xml, run.xml, study.xml and submission.xml.
+3. Provided the data format is correct, the script will create five xml files: sample.xml, experiment.xml, run.xml, study.xml and submission.xml.
 4. If all the .xml files have been successfully created, the script will run a test curl command that will upload all the .xml files to the ENA server and returns a receipt.xml file.  If this process failes, you will be notified and you must correct the error and re-submit using the -curl option.  The script will run a test command to test if its sucessful. You must then run the production curl command to upload your data to production.
 
 
 ## Dependencies
-------------
+---------------
 
 Python >= 2.7
 
@@ -78,7 +78,7 @@ You should familarise yourself with the other options before you begin running t
 
   E.g. for fastq submission (otherwise use -F prefix_name)
 
-    python ena_submission.py -x all -i /phengs/hpc_projects/mycoplasma/samples/fastqs -r phe_mycoplasma -f /phengs/hpc_projects/mycoplasma/data_file_for_ena_submission.txt -o /phengs/hpc_projects/mycoplasma/ena_submission -a /phengs/hpc_projects/mycoplasma/title_and_abstract_for_ena.txt -user Webin-40432 -pass XXXXX
+    python ena_submission.py -x all -i /SOME/PATH/fastqs -r phe_mycoplasma -f /SOME/PATH/data_file_for_ena_submission.txt -o /SOME/PATH/ena_submission -a /SOME/PATH/title_and_abstract_for_ena.txt -user Webin-40432 -pass XXXXX
 
   You may wish to run each step individually. These are the different steps you may run manually:
 
@@ -88,7 +88,7 @@ You should familarise yourself with the other options before you begin running t
 
   --create_checksums_file : only create the checksums file for my fastqs. e.g.
 
-    python ena_submission.py -cs -i /phengs/hpc_projects/mycoplasma/samples/fastqs -r test3
+    python ena_submission.py -cs -i /SOME/PATH/fastqs -r test3
 
   ----
 
@@ -96,7 +96,7 @@ You should familarise yourself with the other options before you begin running t
 
   --upload_data_to_ena_ftp_server : only upload the data to ENA. e.g.
 
-    python ena_submission.py -ftp -i /phengs/hpc_projects/mycoplasma/samples/fastqs -r phe_mycoplasma -user Webin-40432 -pass XXXXX
+    python ena_submission.py -ftp -i /SOME/PATH/fastqs -r phe_mycoplasma -user Webin-40432 -pass XXXXX
 
   ----
 
@@ -104,27 +104,27 @@ You should familarise yourself with the other options before you begin running t
 
   -x sample : use the word 'sample' (same goes for the rest) to create sample.xml only. e.g.
 
-    python ena_submission.py -x sample -i /phengs/hpc_projects/mycoplasma/samples/fastqs -r phe_mycoplasma -f /phengs/hpc_projects/mycoplasma/data_file_for_ena_submission.txt -o /phengs/hpc_projects/mycoplasma/ena_submission
+    python ena_submission.py -x sample -i /SOME/PATH/fastqs -r phe_mycoplasma -f /SOME/PATH/data_file_for_ena_submission.txt -o /SOME/PATH/ena_submission
 
   ----
   To just create experiment.xml file:
 
   -x experiment : to create experiment.xml only. e.g.
 
-    python ena_submission.py -x experiment -i /phengs/hpc_projects/mycoplasma/samples/fastqs -r phe_mycoplasma -f /phengs/hpc_projects/mycoplasma/data_file_for_ena_submission.txt -o /phengs/hpc_projects/mycoplasma/ena_submission  
+    python ena_submission.py -x experiment -i /SOME/PATH/fastqs -r phe_mycoplasma -f /SOME/PATH/data_file_for_ena_submission.txt -o /SOME/PATH/ena_submission  
   ----
 
   To just create run.xml file:
 
   -x run : to create run.xml only. e.g.
 
-    python ena_submission.py -x run -i /phengs/hpc_projects/mycoplasma/samples/fastqs -r phe_mycoplasma -o /phengs/hpc_projects/mycoplasma/ena_submission
+    python ena_submission.py -x run -i /SOME/PATH/fastqs -r phe_mycoplasma -o /SOME/PATH/ena_submission
   ----
 
   To just create study.xml file:
   -x study : to create study.xml only. e.g.
 
-    python ena_submission.py -x study -a /phengs/hpc_projects/mycoplasma/title_and_abstract_for_ena.txt -r phe_mycoplasma -i /phengs/hpc_projects/mycoplasma/samples/fastqs -o /phengs/hpc_projects/mycoplasma/ena_submission
+    python ena_submission.py -x study -a /SOME/PATH/title_and_abstract_for_ena.txt -r phe_mycoplasma -i /SOME/PATH/fastqs -o /SOME/PATH/ena_submission
 
   ----
 
@@ -132,7 +132,7 @@ You should familarise yourself with the other options before you begin running t
 
   -x submission : to create submission.xml only. e.g.
 
-    python ena_submission.py -x submission -i /phengs/hpc_projects/mycoplasma/samples/fastqs -o /phengs/hpc_projects/mycoplasma/ena_submission -r phe_mycoplasma
+    python ena_submission.py -x submission -i /SOME/PATH/fastqs -o /SOME/PATH/ena_submission -r phe_mycoplasma
 
   NOTE: Here you may hold your data from release publicly if you use -ho option and specify the date.
   ----
@@ -141,13 +141,12 @@ You should familarise yourself with the other options before you begin running t
 
   -curl : just run curl command.  Note: you must have uploaded the data and created all the xml files to run the curl command. e.g.
 
-    python ena_submission.py -curl -user Webin-40432 -pass XXXX -o /phengs/hpc_projects/mycoplasma/ena_submission
+    python ena_submission.py -curl -user Webin-YYYYY -pass XXXX -o /SOME/PATH/ena_submission
 
 
 ## Usage
 -----
 -----
-
     -h, --help            show this help message and exit
     --generate_xml_file_for GENERATE_XML_FILE_FOR, -x GENERATE_XML_FILE_FOR
                           please provide the name for the xml you like to
@@ -180,17 +179,21 @@ You should familarise yourself with the other options before you begin running t
                           submission. This name must not have been used before
                           in any other submission to ENA.
     --library_strategy LIBRARY_STRATEGY, -s LIBRARY_STRATEGY
-                          please provide the library strategy used
+                          please provide the library strategy used. default =
+                          WGS
     --library_source LIBRARY_SOURCE, -u LIBRARY_SOURCE
-                          please provide the library source used
+                          please provide the library source used. default =
+                          GENOMIC
     --library_selection LIBRARY_SELECTION, -e LIBRARY_SELECTION
-                          please provide the library selection used
+                          please provide the library selection used. default =
+                          RANDOM
     --read_length READ_LENGTH, -l READ_LENGTH
-                          Please provide the read length
+                          Please provide the read length. default = 100
     --read_sdev READ_SDEV, -sdev READ_SDEV
-                          Please provide the read stdv
+                          Please provide the read stdv. default = 0.0
     --instrument_model INSTRUMENT_MODEL, -m INSTRUMENT_MODEL
-                          please provide the name of the instrument model used
+                          please provide the name of the instrument model used.
+                          default = Illumina HiSeq 2500
     --filetype FILETYPE, -F FILETYPE
                           Please provide the file type, default=fastq
     --hold_date HOLD_DATE, -ho HOLD_DATE
@@ -198,7 +201,8 @@ You should familarise yourself with the other options before you begin running t
                           specified date. Please provide the specified date
                           using the following format: YYYY-MM-DD
     --release, -R         This option will release the data immediatley to the
-                          public domain. Cannot be used with --hold_date
+                          public domain. Cannot be used with --hold_date.
+                          default = False
     --curl_command, -curl
                           Run curl command to upload everything to ENA
     --create_checksums_file, -cs
@@ -208,6 +212,7 @@ You should familarise yourself with the other options before you begin running t
     --out_dir OUT_DIR, -o OUT_DIR
                           please provide the path to the output directory which
                           will include all the xml files.
+
 
 ## Contact
 

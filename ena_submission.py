@@ -15,6 +15,7 @@ from argparse import RawTextHelpFormatter
 import textwrap
 
 class MultilineFormatter(argparse.HelpFormatter):
+	# class to provide new lines when comments below are displayed in git.
     def _fill_text(self, text, width, indent):
 		text = self._whitespace_matcher.sub(' ', text).strip()
 		paragraphs = text.split('|n ')
@@ -105,7 +106,7 @@ def set_up_argparse():
 
 	E.g. for fastq submission (otherwise use -F suffix)|n
 
-	    python ena_submission.py -x all -i /phengs/hpc_projects/mycoplasma/samples/fastqs -r phe_mycoplasma -f /phengs/hpc_projects/mycoplasma/data_file_for_ena_submission.txt -o /phengs/hpc_projects/mycoplasma/ena_submission -a /phengs/hpc_projects/mycoplasma/title_and_abstract_for_ena.txt -user Webin-40432 -pass XXXXX|n
+	    python ena_submission.py -x all -i /SOME/PATH/fastqs -r phe_mycoplasma -f /SOME/PATH/data_file_for_ena_submission.txt -o /SOME/PATH/ena_submission -a /SOME/PATH/title_and_abstract_for_ena.txt -user Webin-YYYYY -pass XXXXX|n
 
 	
 	Or you may wish to run each step individually. The following are examples of how to run each step individually:|n
@@ -114,14 +115,14 @@ def set_up_argparse():
 	To just create the checksums file:|n
 
 	--create_checksums_file : only create the checksums file for my fastqs. e.g.|n
-	    python ena_submission.py -cs -i /phengs/hpc_projects/mycoplasma/samples/fastqs -r test3|n
+	    python ena_submission.py -cs -i /SOME/PATH/fastqs -r test3|n
 
 	----|n
 
 	To just upload your data to the ENA server:|n
 
 	--upload_data_to_ena_ftp_server : only upload the data to ENA. e.g.|n
-	    python ena_submission.py -ftp -i /phengs/hpc_projects/mycoplasma/samples/fastqs -r phe_mycoplasma -user Webin-40432 -pass XXXXX|n
+	    python ena_submission.py -ftp -i /SOME/PATH/fastqs -r phe_mycoplasma -user Webin-40432 -pass XXXXX|n
 
 	----|n
 
@@ -129,27 +130,27 @@ def set_up_argparse():
 
 	  -x sample : use the word 'sample' (same goes for the rest) to create sample.xml only. e.g.|n
 
-	    python ena_submission.py -x sample -i /phengs/hpc_projects/mycoplasma/samples/fastqs -r phe_mycoplasma -f /phengs/hpc_projects/mycoplasma/data_file_for_ena_submission.txt -o /phengs/hpc_projects/mycoplasma/ena_submission|n
+	    python ena_submission.py -x sample -i /SOME/PATH/fastqs -r phe_mycoplasma -f /SOME/PATH/data_file_for_ena_submission.txt -o /SOME/PATH/ena_submission|n
 
 	----|n
 	To just create experiment.xml file:|n
 
 	  -x experiment : to create experiment.xml only. e.g.|n
 
-	    python ena_submission.py -x experiment -i /phengs/hpc_projects/mycoplasma/samples/fastqs -r phe_mycoplasma -f /phengs/hpc_projects/mycoplasma/data_file_for_ena_submission.txt -o /phengs/hpc_projects/mycoplasma/ena_submission  |n
+	    python ena_submission.py -x experiment -i /SOME/PATH/fastqs -r phe_mycoplasma -f /SOME/PATH/data_file_for_ena_submission.txt -o /SOME/PATH/ena_submission  |n
 	----|n
 
 	To just create run.xml file:|n
 
 	  -x run : to create run.xml only. e.g.|n
 
-	    python ena_submission.py -x run -i /phengs/hpc_projects/mycoplasma/samples/fastqs -r phe_mycoplasma -o /phengs/hpc_projects/mycoplasma/ena_submission|n
+	    python ena_submission.py -x run -i /SOME/PATH/fastqs -r phe_mycoplasma -o /SOME/PATH/ena_submission|n
 	----|n
 
 	To just create study.xml file:|n
 	  -x study : to create study.xml only. e.g.|n
 
-	    python ena_submission.py -x study -a /phengs/hpc_projects/mycoplasma/title_and_abstract_for_ena.txt -r phe_mycoplasma -i /phengs/hpc_projects/mycoplasma/samples/fastqs -o /phengs/hpc_projects/mycoplasma/ena_submission|n
+	    python ena_submission.py -x study -a /SOME/PATH/title_and_abstract_for_ena.txt -r phe_mycoplasma -i /SOME/PATH/fastqs -o /SOME/PATH/ena_submission|n
 
 	----|n
 
@@ -157,16 +158,17 @@ def set_up_argparse():
 
 	  -x submission : to create submission.xml only. e.g.|n
 
-	    python ena_submission.py -x submission -i /phengs/hpc_projects/mycoplasma/samples/fastqs -o /phengs/hpc_projects/mycoplasma/ena_submission -r phe_mycoplasma|n
+	    python ena_submission.py -x submission -i /SOME/PATH/fastqs -o /SOME/PATH/ena_submission -r phe_mycoplasma|n
 
 	  NOTE: Here you may hold your data from release publicly if you use -ho option and specify the date.|n
+
 	----|n
 
 	To just run the curl command:|n
 
 	  -curl : just run curl command.  Note: you must have uploaded the data and created all the xml files to run the curl command. e.g.|n
 
-	    python ena_submission.py -curl -user Webin-40432 -pass XXXX -o /phengs/hpc_projects/mycoplasma/ena_submission|n
+	    python ena_submission.py -curl -user Webin-40432 -pass XXXX -o /SOME/PATH/ena_submission|n
 
 	--------|n
 
@@ -183,19 +185,17 @@ def set_up_argparse():
 	parser.add_argument('--ftp_user_name', '-user', help='please provide the ftp user name')
 	parser.add_argument('--ftp_password', '-pass', help='please provide the ftp password')
 	parser.add_argument('--title_and_abstract_file', '-a', help='please provide the title and abstract text file.  This is needed to generate the study.xml file.  The file should be in the following format: full title of the project\tabstract')
-	parser.add_argument('--center_name', '-c', help='Please provide the center name', default="PHE")
+	parser.add_argument('--center_name', '-c', help='Please provide the center name')
 	parser.add_argument('--refname', '-r', help='Please provide the unique name for the whole submission. This name must not have been used before in any other submission to ENA.')
-	parser.add_argument('--library_strategy', '-s', help='please provide the library strategy used', default='WGS')#
-	parser.add_argument('--library_source', '-u', help='please provide the library source used', default='GENOMIC')
-	parser.add_argument('--library_selection', '-e', help='please provide the library selection used', default='RANDOM')
-	parser.add_argument('--read_length', '-l', help='Please provide the read length', default='100')
-	parser.add_argument('--read_sdev', '-sdev', help='Please provide the read stdv', default='0.0')
-	parser.add_argument('--instrument_model', '-m', help='please provide the name of the instrument model used', default='Illumina HiSeq 2500')
+	parser.add_argument('--library_strategy', '-s', help='please provide the library strategy used. default = WGS', default='WGS')#
+	parser.add_argument('--library_source', '-u', help='please provide the library source used. default = GENOMIC', default='GENOMIC')
+	parser.add_argument('--library_selection', '-e', help='please provide the library selection used. default = RANDOM', default='RANDOM')
+	parser.add_argument('--read_length', '-l', help='Please provide the read length. default = 100', default='100')
+	parser.add_argument('--read_sdev', '-sdev', help='Please provide the read stdv. default = 0.0', default='0.0')
+	parser.add_argument('--instrument_model', '-m', help='please provide the name of the instrument model used. default = Illumina HiSeq 2500', default='Illumina HiSeq 2500')
 	parser.add_argument('--filetype', '-F', help='Please provide the file type, default=fastq', default='fastq')
-	# parser.add_argument('--center_project_name', '-p', help='Give the study a project name.  This is needed for the study.xml file', default='PHE_SCIENTIFIC_PROJECT')
-	# parser.add_argument('--suffix', '-suffix', help='Please provide the suffix of your files. Note: your suffix must contain R1 in it, e.g. prefix.R1.fastq.gz', default='R1.fastq.gz')
 	parser.add_argument('--hold_date', '-ho', help='This option will hold the data privately until a specified date.  Please provide the specified date using the following format: YYYY-MM-DD')
-	parser.add_argument('--release', '-R', help='This option will release the data immediatley to the public domain. Cannot be used with --hold_date', default=False, action='store_true')
+	parser.add_argument('--release', '-R', help='This option will release the data immediatley to the public domain. Cannot be used with --hold_date. default = False', default=False, action='store_true')
 	parser.add_argument('--curl_command', '-curl', help='Run curl command to upload everything to ENA',action='store_true')
 	parser.add_argument('--create_checksums_file', '-cs', help='Create a checksum file',action='store_true')
 	parser.add_argument('--upload_data_to_ena_ftp_server', '-ftp', help='Upload data into the ftp server',action='store_true')
@@ -247,7 +247,6 @@ def main(opts):
 			check_if_flag_is_provided(opts.refname,"refname","-r")
 			check_if_flag_is_provided(opts.data_file,"data_file","-f")
 			check_if_flag_is_provided(opts.title_and_abstract_file,"title_and_abstract_file","-a")
-			# check_if_flag_is_provided(opts.center_project_name,"center_project_name","-p")
 			check_if_flag_is_provided(opts.out_dir,"out_dir","-o")
 
 			populate_data_to_ENA.create_checksums_file(opts.dir_of_input_data,opts.refname,opts.filetype)
@@ -310,7 +309,6 @@ def main(opts):
 
 			check_if_flag_is_provided(opts.refname,"refname","-r")
 			check_if_flag_is_provided(opts.title_and_abstract_file,"title_and_abstract_file","-a")
-			# check_if_flag_is_provided(opts.center_project_name,"center_project_name","-p")
 			check_if_flag_is_provided(opts.out_dir,"out_dir","-o")
 
 			populate_data_to_ENA.study_xml(opts.title_and_abstract_file,opts.center_name,opts.refname,opts.out_dir)
