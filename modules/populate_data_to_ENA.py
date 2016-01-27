@@ -588,7 +588,7 @@ def run_curl_command(ftp_user_name,ftp_password,out):
 	(curl_output, err) = p.communicate()
 
 	if "success=\"false\"" in open(out+"/receipt.xml").read():
-		print "\nERROR: There is a problem with the submission.  Please check the receipt.xml file in", out+"/receipt.xml", "and correct the error and re-submit using the -curl command.\n"
+		print "\nERROR: There is a problem with the submission.  Please check the file ", out+"/receipt.xml", "and correct the error and re-submit using the -curl command.\n"
 		sys.exit()
 	# elif "success=\"true\"" in open(out+"/receipt.xml").read():
 	# 	print "\nTest submission is successfull!"
