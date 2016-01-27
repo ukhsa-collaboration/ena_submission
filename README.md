@@ -36,7 +36,7 @@ To upload your files to ENA, you will need the following:
   
   MN127.processed.R2.fastq.gz
 
-  Otherwise, if you are uploading a different type of file, like bam files or fasta files, you can name them whatever you like but they should have the prefix at the end, e.g. .bam or .fasta
+  Otherwise, if you are uploading a different type of file, like bam files or fasta files, you can name them whatever you like but they should have the prefix at the end, e.g. .bam or .fasta.  Use the -F flag to do so, e.g. -F bam.
 
 2. A csv (comma separated values) file that contains all the information for each of your samples.  The text file should contain four required columns.  You may add as many coloumns of data as you wish after the fourth required coloumn.  The columns are separated by commas.  e.g. (note the headings are required as seen below):
 
@@ -45,7 +45,7 @@ To upload your files to ENA, you will need the following:
 
   data....
 
-  See a template file in the examples dir.
+  You may like to use the template file provided in the examples folder.  You might also like to see an example file in the examples folder.
 
 3. A text file that contains the title for your project and an abstract explaining the project.  The two coloumns must be separated by tabs. There are no headings needed here. e.g.
 
@@ -60,15 +60,15 @@ NOTE!! If you are uploading files other than fastq files, you must use the -F fl
 
 Before you run the script, make sure you have the following ready as you cannot proceed without it:
 
-    -i : dir to your files
+    -i : full path to your files you would like to upload to ENA. (point 1 above)
     -r : a reference name for your project
-    -f : the path to the data file (see point 2 above)
-    -a : the path to the title and abstract text file
+    -f : the path to the data file (point 2 above)
+    -a : the path to the title and abstract text file (point 3 above)
     -o : the path to the output directory
-    -user : ENA username
-    -pass : ENA password
+    -user : ENA username (point 4 above)
+    -pass : ENA password (point 4 above)
 
-You should familarise yourself with the other options before you begin running the script.
+You should familarise yourself with the other options before you begin running the script.  To do so, run python ena_submission.py -h
 
 
 ## Examples of commands
@@ -96,7 +96,7 @@ You should familarise yourself with the other options before you begin running t
 
   --upload_data_to_ena_ftp_server : only upload the data to ENA. e.g.
 
-    python ena_submission.py -ftp -i /SOME/PATH/fastqs -r phe_mycoplasma -user Webin-40432 -pass XXXXX
+    python ena_submission.py -ftp -i /SOME/PATH/fastqs -r phe_mycoplasma -user Webin-YYYYY -pass XXXXX
 
   ----
 
