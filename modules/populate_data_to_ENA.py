@@ -295,18 +295,20 @@ def sample_xml(dir_of_input_data,refname,data_file,center_name,out_dir):
 				elif key == "DESCRIPTION":
 					desc = ET.SubElement(sample, "DESCRIPTION").text = ''.join(field)
 			
-			sample_attributes = ET.SubElement(sample, "SAMPLE_ATTRIBUTES")
+			# only add sample attributes if required
+			if len(remaining_keys) > 0:	
+				sample_attributes = ET.SubElement(sample, "SAMPLE_ATTRIBUTES")
 
-			for key in remaining_keys:
-				field = []
-				field.append(sample_id_and_data[key][index])
-				# for below only use if you want to update and have isolate ena number
-				sample_attribute = ET.SubElement(sample_attributes, "SAMPLE_ATTRIBUTE")
-				# tag = ET.SubElement(sample_attribute, "TAG").text = "SAMPLE"
-				# value = ET.SubElement(sample_attribute, "VALUE").text = str(sample_name)
-				tag = ET.SubElement(sample_attribute, "TAG").text = str(key)
-				value = ET.SubElement(sample_attribute, "VALUE").text = ''.join(field)
-				# use the indent function to indent the xml file
+				for key in remaining_keys:
+					field = []
+					field.append(sample_id_and_data[key][index])
+					# for below only use if you want to update and have isolate ena number
+					sample_attribute = ET.SubElement(sample_attributes, "SAMPLE_ATTRIBUTE")
+					# tag = ET.SubElement(sample_attribute, "TAG").text = "SAMPLE"
+					# value = ET.SubElement(sample_attribute, "VALUE").text = str(sample_name)
+					tag = ET.SubElement(sample_attribute, "TAG").text = str(key)
+					value = ET.SubElement(sample_attribute, "VALUE").text = ''.join(field)
+					# use the indent function to indent the xml file
 	else:
 		print "ERROR: The " + data_file + " file does not contain one of the following fields: SAMPLE, TAXON_ID, SCIENTIFIC_NAME, DESCRIPTION. Please add the relevant field to proceed...."
 		sys.exit(1)
