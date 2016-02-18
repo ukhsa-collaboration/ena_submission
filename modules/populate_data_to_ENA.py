@@ -34,6 +34,38 @@ def check_file_exists(filepath, file_description):
 		print("The " + file_description + " (" + filepath + ") does not exist")
 		sys.exit(1)
 
+def check_data_file(data_file):
+	"""
+	A function to check whether the data input file is in the right format or not.
+
+	"""
+	meta_data_file = file(data_file, 'r')
+	# the data file should have this heading...
+	data_file_heading = ['SAMPLE', 'TAXON_ID', 'DESCRIPTION', 'SCIENTIFIC_NAME']
+	for lineNum, line in enumerate(meta_data_file):
+		if lineNum == 0:
+			headings_stripped = line.strip()
+			headings = headings_stripped.split(',')
+			# if the data_file_heading list has the heading in the data_file 
+			if set(headings).issuperset(set(data_file_heading)):
+				# Now compare the order...
+				if headings[0] == data_file_heading[0] and headings[1] == data_file_heading[1] and headings[2] == data_file_heading[2] and headings[3] == data_file_heading[3]:
+					print "Checking if data_file header order is correct....Yes"
+				else:
+					print "ERROR: The ORDER of the headers in the "+data_file+" file is incorrect.  You must have the following order: SAMPLE,TAXON_ID,SCIENTIFIC_NAME,DESCRIPTION."
+			else:
+				print "ERROR: The headers in the "+data_file+" file are incorrect.  You must have the following data headers: SAMPLE,TAXON_ID,SCIENTIFIC_NAME,DESCRIPTION."
+
+# def check_abstract_file(title_and_abstract_file):
+
+# 	with open(title_and_abstract_file, 'r') as f:
+# 		    lines = f.readlines()
+# 		    for line in lines:
+# 				cols = line.decode('utf-8').strip().split('\t')
+# 				title = cols[0]
+# 				abstract = cols[1]
+
+
 def create_checksums_file(dir_of_input_data,refname,filetype):
 
 	'''
@@ -71,7 +103,7 @@ def create_checksums_file(dir_of_input_data,refname,filetype):
 			checksum_main = hashlib.md5(open(file, 'rb').read()).hexdigest()
 			checksums_file.write(checksum_main+" "+seqFileName_R1+"\n")
 			if filetype == "fastq":
-				read_2_file = ''.join(glob.glob(SeqDir+"/"+sample_name+"*.R2.fastq.gz"))
+				read_2_file = ''.join(glob.glob(SeqDir+"/"+sample_name+".R2.fastq.gz"))
 				checksum_read2 = hashlib.md5(open(read_2_file, 'rb').read()).hexdigest()
 				(SeqDir,seqFileName_R2) = os.path.split(read_2_file)
 				checksums_file.write(checksum_read2+" "+seqFileName_R2+"\n")
@@ -232,16 +264,20 @@ def create_dict_with_data(dir_of_input_data,refname,data_file, delim="\t", heade
 					indexToName[i] = i
 				i += 1
 		else:
-			cells = line.split(',')
-			i = 0
-			for strain in strain_names:
-				if strain in cells[0]:
-					for cell in cells:
-						cell = cell.strip()
-						cols[indexToName[i]] += [cell]
-						i += 1
+			strip_line = line.strip()
+			# cells is a list of each of the lines in the data file, e.g. ['ST38_21', '562', 'Escherichia coli', 'OXA-48 producer', 'North West_3', '28_2014']
+			cells = strip_line.split(',')
+			x = 0
+			# if the sample name (cells[0]) is in the strain names obtained from the checksums file then add to dict cols 
+			if cells[0] in strain_names:
+				for cell in cells:
+					cell = cell.rstrip()
+					#indexToName[i] is the header name index
+					cols[indexToName[x]] += [cell]
+					x += 1
+			else:
+				print "ERROR: "+cells[0]+" from the "+data_file+" is not equivalent to the sample name you have labelled your files in"+"".join(strain_names)
 	return cols
-	print cols
 
 def sample_xml(dir_of_input_data,refname,data_file,center_name,out_dir):
 	
