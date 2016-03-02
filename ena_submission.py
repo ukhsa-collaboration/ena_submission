@@ -180,8 +180,8 @@ Merge the remote changes before pushing again
 	ali.al-shahib@phe.gov.uk|n""", formatter_class=MultilineFormatter)
 
 	# parser = argparse.ArgumentParser(epilog="Good luck! If your jobs breaks, don't blame me :-)", add_help=True)
-	parser.add_argument('--do_everything', '-d', help='This option would run everything in one step, i.e: 1) Create checkums, 2) Uploads files to ENA ftp server, 3) Creats all the XML files, 4) Submits XML files to ENA (test only)')
-	parser.add_argument('--generate_xml_file_for', '-x', help='please provide the name for the xml you like to generate, one of the following:experiment,run,sample,study,submission',action='store_true')
+	parser.add_argument('--do_everything', '-d', help='This option would run everything in one step, i.e: 1) Create checkums, 2) Uploads files to ENA ftp server, 3) Creats all the XML files, 4) Submits XML files to ENA (test only)',action='store_true')
+	parser.add_argument('--generate_xml_file_for', '-x', help='please provide the name for the xml you like to generate, one of the following:experiment,run,sample,study,submission')
 	parser.add_argument('--dir_of_input_data', '-i', help='please provide the path for the files you like to upload to ENA. NOTE: the fastq files must be in the following format: *.R1.fastq.gz and *.R2.fastq.gz.')
 	parser.add_argument('--data_file', '-f', help='data_file, file : this text file must have at least four columns seperated by TABS in the following order and with the following headings:  Column 1: SAMPLE, Column 2: TAXON_ID, Column 3: SCIENTIFIC_NAME, Column 4: DESCRIPTION.  If you like to add further data then add it after the DESCRIPTION column.')
 	parser.add_argument('--ftp_user_name', '-user', help='please provide the ftp user name')

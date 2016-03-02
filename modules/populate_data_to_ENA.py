@@ -17,6 +17,23 @@ import os
 import ftplib
 import subprocess
 
+class FtpUploadTracker:
+	sizeWritten = 0
+	totalSize = 0
+	lastShownPercent = 0
+
+	def __init__(self, totalSize):
+	    self.totalSize = totalSize
+
+	def handle(self, block):
+	    self.sizeWritten += 1024
+	    percentComplete = round((self.sizeWritten / self.totalSize) * 100)
+
+	    if (self.lastShownPercent != percentComplete):
+	        self.lastShownPercent = percentComplete
+	        print(str(percentComplete) + " percent complete")
+
+
 def check_file_exists(filepath, file_description):
 
 	"""
@@ -41,7 +58,7 @@ def check_data_file(data_file):
 	"""
 	meta_data_file = file(data_file, 'r')
 	# the data file should have this heading...
-	data_file_heading = ['SAMPLE', 'TAXON_ID', 'DESCRIPTION', 'SCIENTIFIC_NAME']
+	data_file_heading = ['SAMPLE', 'TAXON_ID', 'SCIENTIFIC_NAME', 'DESCRIPTION']
 	for lineNum, line in enumerate(meta_data_file):
 		if lineNum == 0:
 			headings_stripped = line.strip()
@@ -53,8 +70,10 @@ def check_data_file(data_file):
 					print "Checking if data_file header order is correct....Yes"
 				else:
 					print "ERROR: The ORDER of the headers in the "+data_file+" file is incorrect.  You must have the following order: SAMPLE,TAXON_ID,SCIENTIFIC_NAME,DESCRIPTION."
+					sys.exit()
 			else:
 				print "ERROR: The headers in the "+data_file+" file are incorrect.  You must have the following data headers: SAMPLE,TAXON_ID,SCIENTIFIC_NAME,DESCRIPTION."
+				sys.exit()
 
 # def check_abstract_file(title_and_abstract_file):
 
@@ -172,13 +191,15 @@ def upload_data_to_ena_ftp_server(dir_of_input_data,refname,ftp_user_name,ftp_pa
 		for file in files:
 			(SeqDir,seqFileName) = os.path.split(file)
 			print "uploading", file, "to ENA ftp server.....\n"
+			# uploadTracker = FtpUploadTracker(int(FtpUploadTracker.totalSize))
+			# ftp.storbinary('STOR '+seqFileName, open(file, 'rb'), 1024, uploadTracker.handle)
 			ftp.storbinary('STOR '+seqFileName, open(file, 'rb'))
 	except IOError:
 		print "Oops! something has gone wrong while uploading data to the ENA ftp server!"
 	ftp.quit()
 
 	print "All done!"
-
+	
 def indent(elem, level=0):
 	
 	'''
