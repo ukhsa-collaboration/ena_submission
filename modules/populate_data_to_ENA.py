@@ -40,7 +40,7 @@ def check_file_exists(filepath, file_description):
 	A function to check if a file exists.
 	It will print out an error message and exit if the file is not found
 
-	Parameters
+	Params
 	----------
 	filepath : String
 	    the path to the file to be checked
@@ -54,6 +54,15 @@ def check_file_exists(filepath, file_description):
 def check_data_file(data_file):
 	"""
 	A function to check whether the data input file is in the right format or not.
+
+	Params
+    ------
+    data_file, str: file (as a path) containing the meta data for the project.
+
+    return
+    ------
+    None
+
 
 	"""
 	meta_data_file = file(data_file, 'r')
@@ -75,15 +84,34 @@ def check_data_file(data_file):
 				print "ERROR: The headers in the "+data_file+" file are incorrect.  You must have the following data headers: SAMPLE,TAXON_ID,SCIENTIFIC_NAME,DESCRIPTION."
 				sys.exit()
 
-# def check_abstract_file(title_and_abstract_file):
+def check_abstract_file(title_and_abstract_file):
+	
+	'''
+	check_abstract_file(title_and_abstract_file)
 
-# 	with open(title_and_abstract_file, 'r') as f:
-# 		    lines = f.readlines()
-# 		    for line in lines:
-# 				cols = line.decode('utf-8').strip().split('\t')
-# 				title = cols[0]
-# 				abstract = cols[1]
+	A function to check whether the title and abstract function is in the correct format.
 
+
+	Params
+    ------
+    title_and_abstract_file, str: file (as a path) containing title and abstract of the project.
+
+    return
+    ------
+    None
+
+	'''
+	try:
+		with open(title_and_abstract_file, 'r') as f:
+		    lines = f.readlines()
+		    for line in lines:
+				cols = line.decode('utf-8').strip().split('\t')
+				title = cols[0]
+				abstract = cols[1]
+		print "Checking if title and abstract file is in the correct format....Yes"
+	except:
+		print "Something is wrong with the title and abstract file " + title_and_abstract_file + ". It should have a title with a tab separator and abstract.  The file should only have one line. Please check and re-submit."
+		sys.exit()
 
 def create_checksums_file(dir_of_input_data,refname,filetype):
 
@@ -103,30 +131,40 @@ def create_checksums_file(dir_of_input_data,refname,filetype):
     checksums_file, file : a checksum file will be created in the dir_of_input_data directory.  It would be called: refname_"checksums.md5".
 
 	'''
-	checksums_file = open(dir_of_input_data+'/'+refname+'_checksums.md5', "w")
-
 	try:
+		num_lines_in_checksums_file = sum(1 for line in open(dir_of_input_data+'/'+refname+'_checksums.md5'))
+
 		if filetype == "fastq":
 			files = glob.glob(dir_of_input_data+"/"+"*.R1.fastq.gz")
+			num_files = len(files)*2
 		else:
 			files = glob.glob(dir_of_input_data+"/"+"*."+filetype)
+			num_files = len(files)
 
 		if not files:
 			print "The files in "+dir_of_input_data+" do not match the prefix.  Please check and try again. Note: if you are uploading other than fastq files please use the -F option to specify the prefix of your files, e.g. -F bam."
 			sys.exit()
-		print "creating checksums....."
-		for file in files:
-			(SeqDir,seqFileName_R1) = os.path.split(file)
-			# get the sample name.  filenames must be in the following format: sample_name.processed.R1.fastq.gz
-			sample_name = seqFileName_R1.split('.')[0]
-			checksum_main = hashlib.md5(open(file, 'rb').read()).hexdigest()
-			checksums_file.write(checksum_main+" "+seqFileName_R1+"\n")
-			if filetype == "fastq":
-				read_2_file = ''.join(glob.glob(SeqDir+"/"+sample_name+".R2.fastq.gz"))
-				checksum_read2 = hashlib.md5(open(read_2_file, 'rb').read()).hexdigest()
-				(SeqDir,seqFileName_R2) = os.path.split(read_2_file)
-				checksums_file.write(checksum_read2+" "+seqFileName_R2+"\n")
-		print "created checksums file.  It's located in "+dir_of_input_data+'/'+refname+'_checksums.md5'
+
+		# find out if checksums has already been done first
+
+		if num_lines_in_checksums_file == num_files:
+			print "\nChecksums file has already been generated and fully populated!"
+		else:
+			checksums_file = open(dir_of_input_data+'/'+refname+'_checksums.md5', "w")
+
+			print "creating checksums....."
+			for file in files:
+				(SeqDir,seqFileName_R1) = os.path.split(file)
+				# get the sample name.  filenames must be in the following format: sample_name.processed.R1.fastq.gz
+				sample_name = seqFileName_R1.split('.')[0]
+				checksum_main = hashlib.md5(open(file, 'rb').read()).hexdigest()
+				checksums_file.write(checksum_main+" "+seqFileName_R1+"\n")
+				if filetype == "fastq":
+					read_2_file = ''.join(glob.glob(SeqDir+"/"+sample_name+".R2.fastq.gz"))
+					checksum_read2 = hashlib.md5(open(read_2_file, 'rb').read()).hexdigest()
+					(SeqDir,seqFileName_R2) = os.path.split(read_2_file)
+					checksums_file.write(checksum_read2+" "+seqFileName_R2+"\n")
+			print "created checksums file.  It's located in "+dir_of_input_data+'/'+refname+'_checksums.md5'
 	except IOError:
 		print "ERROR: Something has gone wrong with creating the checksums file.  Please check and re-submit."
 		sys.exit()
@@ -156,6 +194,7 @@ def upload_data_to_ena_ftp_server(dir_of_input_data,refname,ftp_user_name,ftp_pa
 		print "\nconnecting to ftp.webin.ebi.ac.uk...."
 		ftp = ftplib.FTP("webin.ebi.ac.uk",ftp_user_name, ftp_password)
 	except IOError:
+		print(ftp.lastErrorText())
 		print "ERROR: could not connect to the ftp server.  Please check your login details."
 		sys.exit()
 
@@ -183,22 +222,42 @@ def upload_data_to_ena_ftp_server(dir_of_input_data,refname,ftp_user_name,ftp_pa
 	
 	print "Now uploading all the data to ENA ftp server in the", refname, "directory\n"
 
-	try:
-		if filetype == "fastq":
-			files = glob.glob(dir_of_input_data+"/"+"*.fastq.gz")
-		else:
-			files = glob.glob(dir_of_input_data+"/"+"*."+filetype)
-		for file in files:
-			(SeqDir,seqFileName) = os.path.split(file)
-			print "uploading", file, "to ENA ftp server.....\n"
-			# uploadTracker = FtpUploadTracker(int(FtpUploadTracker.totalSize))
-			# ftp.storbinary('STOR '+seqFileName, open(file, 'rb'), 1024, uploadTracker.handle)
-			ftp.storbinary('STOR '+seqFileName, open(file, 'rb'))
-	except IOError:
+	# added a while loop so if ftp fails it can try again.
+	ftp.cwd(str(refname))
+
+	for i in range(0,3):
+		try:
+			if filetype == "fastq":
+				files = glob.glob(dir_of_input_data+"/"+"*.fastq.gz")
+			else:
+				files = glob.glob(dir_of_input_data+"/"+"*."+filetype)
+			for file in files:
+				
+				(SeqDir,seqFileName) = os.path.split(file)
+				# if the sample has already been uploaded, check the file size number. If its the same as the dir file size then move on otherwise upload it again.
+				if seqFileName in ftp.nlst():
+
+					fileSize_in_ftp = ftp.size(seqFileName)
+					fileSize_in_dir = os.path.getsize(str(file))
+					if fileSize_in_dir != fileSize_in_ftp:
+						print seqFileName+" is uploaded but not all of it so uploading it again now to ENA ftp server.Sample\n"
+						ftp.storbinary('STOR '+seqFileName, open(file, 'rb'))
+					else:
+						print seqFileName + " has already been uploaded.\n"
+				else:
+					print "uploading", file, "to ENA ftp server.\n"
+					ftp.storbinary('STOR '+seqFileName, open(file, 'rb'))
+			break
+		except:
+			print "Something went wrong with ftp, lets try again...."
+	else:
 		print "Oops! something has gone wrong while uploading data to the ENA ftp server!"
+		sys.exit()
+			
+	
 	ftp.quit()
 
-	print "All done!"
+	
 	
 def indent(elem, level=0):
 	
@@ -533,23 +592,25 @@ def study_xml(title_and_abstract_file,center_name,refname,out_dir):
 	'''
 
 	study_set = ET.Element('STUDY_SET')
+	try:
+		with open(title_and_abstract_file, 'r') as f:
+		    lines = f.readlines()
+		    for line in lines:
+				cols = line.decode('utf-8').strip().split('\t')
+				title = cols[0]
+				abstract = cols[1]
 
-	with open(title_and_abstract_file, 'r') as f:
-	    lines = f.readlines()
-	    for line in lines:
-			cols = line.decode('utf-8').strip().split('\t')
-			title = cols[0]
-			abstract = cols[1]
-
-			study = ET.SubElement(study_set, 'STUDY', alias=refname, center_name=center_name)
-			# indent
-			descriptor = ET.SubElement(study, 'DESCRIPTOR')
-			# indent
-			# center_project_name = ET.SubElement(descriptor, 'CENTER_PROJECT_NAME').text = center_project_name
-			study_title = ET.SubElement(descriptor, 'STUDY_TITLE').text = str(title)
-			study_type = ET.SubElement(descriptor, 'STUDY_TYPE', existing_study_type="Whole Genome Sequencing")
-			study_abstract = ET.SubElement(descriptor, 'STUDY_ABSTRACT').text = abstract
-
+				study = ET.SubElement(study_set, 'STUDY', alias=refname, center_name=center_name)
+				# indent
+				descriptor = ET.SubElement(study, 'DESCRIPTOR')
+				# indent
+				# center_project_name = ET.SubElement(descriptor, 'CENTER_PROJECT_NAME').text = center_project_name
+				study_title = ET.SubElement(descriptor, 'STUDY_TITLE').text = str(title)
+				study_type = ET.SubElement(descriptor, 'STUDY_TYPE', existing_study_type="Whole Genome Sequencing")
+				study_abstract = ET.SubElement(descriptor, 'STUDY_ABSTRACT').text = abstract
+	except EOFError:
+		print "problem with the title and abstract file!"
+		sys.exit()
 	# use the indent function to indent the xml file
 	indent(study_set)
 	# create tree

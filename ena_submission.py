@@ -252,6 +252,7 @@ def main(opts):
 		check_if_flag_is_provided(opts.out_dir,"out_dir","-o")
 
 		populate_data_to_ENA.check_data_file(opts.data_file)
+		populate_data_to_ENA.check_abstract_file(opts.title_and_abstract_file)
 		populate_data_to_ENA.create_checksums_file(opts.dir_of_input_data,opts.refname,opts.filetype)
 		populate_data_to_ENA.upload_data_to_ena_ftp_server(opts.dir_of_input_data,opts.refname,opts.ftp_user_name,opts.ftp_password,opts.filetype)
 		populate_data_to_ENA.sample_xml(opts.dir_of_input_data,opts.refname,opts.data_file,opts.center_name,opts.out_dir)
