@@ -132,8 +132,6 @@ def create_checksums_file(dir_of_input_data,refname,filetype):
 
 	'''
 	try:
-		num_lines_in_checksums_file = sum(1 for line in open(dir_of_input_data+'/'+refname+'_checksums.md5'))
-
 		if filetype == "fastq":
 			files = glob.glob(dir_of_input_data+"/"+"*.R1.fastq.gz")
 			num_files = len(files)*2
@@ -146,16 +144,18 @@ def create_checksums_file(dir_of_input_data,refname,filetype):
 			sys.exit()
 
 		# find out if checksums has already been done first
+		if os.path.exists(dir_of_input_data+'/'+refname+'_checksums.md5'):
+			num_lines_in_checksums_file = sum(1 for line in open(dir_of_input_data+'/'+refname+'_checksums.md5'))
 
-		if num_lines_in_checksums_file == num_files:
-			print "\nChecksums file has already been generated and fully populated!"
+			if num_lines_in_checksums_file == num_files:
+				print "\nChecksums file has already been generated and fully populated!"
 		else:
 			checksums_file = open(dir_of_input_data+'/'+refname+'_checksums.md5', "w")
 
 			print "creating checksums....."
 			for file in files:
 				(SeqDir,seqFileName_R1) = os.path.split(file)
-				# get the sample name.  filenames must be in the following format: sample_name.processed.R1.fastq.gz
+				# get the sample name.  filenames must be in the following format: sample_name.R1.fastq.gz
 				sample_name = seqFileName_R1.split('.')[0]
 				checksum_main = hashlib.md5(open(file, 'rb').read()).hexdigest()
 				checksums_file.write(checksum_main+" "+seqFileName_R1+"\n")
