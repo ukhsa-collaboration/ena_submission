@@ -223,6 +223,7 @@ def upload_data_to_ena_ftp_server(dir_of_input_data,refname,ftp_user_name,ftp_pa
 	print "Now uploading all the data to ENA ftp server in the", refname, "directory\n"
 
 	# added a while loop so if ftp fails it can try again.
+	# print ftplib.FTP.dir(ftp)
 	ftp.cwd(str(refname))
 
 	for i in range(0,3):
