@@ -17,22 +17,6 @@ import os
 import ftplib
 import subprocess
 
-class FtpUploadTracker:
-	sizeWritten = 0
-	totalSize = 0
-	lastShownPercent = 0
-
-	def __init__(self, totalSize):
-	    self.totalSize = totalSize
-
-	def handle(self, block):
-	    self.sizeWritten += 1024
-	    percentComplete = round((self.sizeWritten / self.totalSize) * 100)
-
-	    if (self.lastShownPercent != percentComplete):
-	        self.lastShownPercent = percentComplete
-	        print(str(percentComplete) + " percent complete")
-
 
 def check_file_exists(filepath, file_description):
 
@@ -144,12 +128,7 @@ def create_checksums_file(dir_of_input_data,refname,filetype):
 			sys.exit()
 
 		# find out if checksums has already been done first
-		if os.path.exists(dir_of_input_data+'/'+refname+'_checksums.md5'):
-			num_lines_in_checksums_file = sum(1 for line in open(dir_of_input_data+'/'+refname+'_checksums.md5'))
-
-			if num_lines_in_checksums_file == num_files:
-				print "\nChecksums file has already been generated and fully populated!"
-		else:
+		if not os.path.exists(dir_of_input_data+'/'+refname+'_checksums.md5'):
 			checksums_file = open(dir_of_input_data+'/'+refname+'_checksums.md5', "w")
 
 			print "creating checksums....."
@@ -165,6 +144,11 @@ def create_checksums_file(dir_of_input_data,refname,filetype):
 					(SeqDir,seqFileName_R2) = os.path.split(read_2_file)
 					checksums_file.write(checksum_read2+" "+seqFileName_R2+"\n")
 			print "created checksums file.  It's located in "+dir_of_input_data+'/'+refname+'_checksums.md5'
+		else:
+			num_lines_in_checksums_file = sum(1 for line in open(dir_of_input_data+'/'+refname+'_checksums.md5'))
+
+			if num_lines_in_checksums_file == num_files:
+				print "\nChecksums file has already been generated and fully populated!"
 	except IOError:
 		print "ERROR: Something has gone wrong with creating the checksums file.  Please check and re-submit."
 		sys.exit()
@@ -204,6 +188,7 @@ def upload_data_to_ena_ftp_server(dir_of_input_data,refname,ftp_user_name,ftp_pa
 	try:
 		if refname in ftp.nlst() :
 			print refname, "directory in ftp already exists....OK no problem..."
+			ftp.cwd(str(refname))
 		else:
 			print "\nmaking new directory in ftp called", refname
 			ftp.mkd(str(refname))
@@ -224,7 +209,7 @@ def upload_data_to_ena_ftp_server(dir_of_input_data,refname,ftp_user_name,ftp_pa
 
 	# added a while loop so if ftp fails it can try again.
 	# print ftplib.FTP.dir(ftp)
-	ftp.cwd(str(refname))
+	# ftp.cwd(str(refname))
 
 	for i in range(0,3):
 		try:
@@ -232,6 +217,7 @@ def upload_data_to_ena_ftp_server(dir_of_input_data,refname,ftp_user_name,ftp_pa
 				files = glob.glob(dir_of_input_data+"/"+"*.fastq.gz")
 			else:
 				files = glob.glob(dir_of_input_data+"/"+"*."+filetype)
+			
 			for file in files:
 				
 				(SeqDir,seqFileName) = os.path.split(file)
@@ -241,7 +227,7 @@ def upload_data_to_ena_ftp_server(dir_of_input_data,refname,ftp_user_name,ftp_pa
 					fileSize_in_ftp = ftp.size(seqFileName)
 					fileSize_in_dir = os.path.getsize(str(file))
 					if fileSize_in_dir != fileSize_in_ftp:
-						print seqFileName+" is uploaded but not all of it so uploading it again now to ENA ftp server.Sample\n"
+						print seqFileName+" is uploaded but not all of it so uploading it again now to ENA ftp server.\n"
 						ftp.storbinary('STOR '+seqFileName, open(file, 'rb'))
 					else:
 						print seqFileName + " has already been uploaded.\n"
@@ -358,6 +344,7 @@ def create_dict_with_data(dir_of_input_data,refname,data_file, delim="\t", heade
 					x += 1
 			else:
 				print "ERROR: "+cells[0]+" from the "+data_file+" is not equivalent to the sample name you have labelled your files in"+"".join(strain_names)
+				sys.exit()
 	return cols
 
 def sample_xml(dir_of_input_data,refname,data_file,center_name,out_dir):
@@ -557,7 +544,8 @@ def run_xml(dir_of_input_data,refname,center_name,filetype,out_dir):
 					file1 = ET.SubElement(files, 'FILE', checksum=checksum_read1, checksum_method="MD5", filename=refname+"/"+read1[1], filetype=filetype)
 					file2 = ET.SubElement(files, 'FILE', checksum=checksum_read2, checksum_method="MD5", filename=refname+"/"+read2[1], filetype=filetype)
 			except StopIteration:
-				print "ERROR: no second read found for", sample_name 
+				print "ERROR: no second read found for", sample_name
+				sys.exit() 
 
 	# use the indent function to indent the xml file
 	indent(run_set)
