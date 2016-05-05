@@ -216,9 +216,6 @@ def check_if_flag_is_provided(flag,name,option):
 
 def main(opts):
 
-	if not os.path.exists(opts.out_dir):
-		    os.makedirs(opts.out_dir)
-
 	if opts.create_checksums_file:
 		check_if_flag_is_provided(opts.refname,"refname","-r")
 		check_if_flag_is_provided(opts.dir_of_input_data,"dir_of_input_data","-i")
