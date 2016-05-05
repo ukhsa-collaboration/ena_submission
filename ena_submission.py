@@ -216,6 +216,9 @@ def check_if_flag_is_provided(flag,name,option):
 
 def main(opts):
 
+	if not os.path.exists(opts.out_dir):
+		    os.makedirs(opts.out_dir)
+
 	if opts.create_checksums_file:
 		check_if_flag_is_provided(opts.refname,"refname","-r")
 		check_if_flag_is_provided(opts.dir_of_input_data,"dir_of_input_data","-i")
@@ -240,8 +243,6 @@ def main(opts):
 	elif opts.do_everything:
 		print "\nYou would like me to upload your files, generate all the xml files needed to submit your data to ENA, and upload the xml files to ENA.\nLet me check if you have provided all the necessary information....\n"
 		# check if output file exists, otherwise create it...
-		if not os.path.exists(opts.out_dir):
-		    os.makedirs(opts.out_dir)
 		check_if_flag_is_provided(opts.ftp_user_name, "ftp_user_name", "-user")
 		check_if_flag_is_provided(opts.ftp_password, "ftp_password", "pass")
 		check_if_flag_is_provided(opts.dir_of_input_data,"dir_of_input_data","-i")

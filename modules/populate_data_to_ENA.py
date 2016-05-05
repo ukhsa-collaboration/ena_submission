@@ -360,7 +360,7 @@ def sample_xml(dir_of_input_data,refname,data_file,center_name,out_dir):
     data_file, file : this text file must have at least three columns seperated by commas in the following order and with the following headings:  Column 1: SAMPLE, Column 2: TAXON_ID, Column 3: SCIENTIFIC_NAME, Column 4: DESCRIPTION.  If you like to add further data then add it after the DESCRIPTION column.
     refname, str: You must provide a reference name for your study, e.g. phe_ecoli
     center_name, str : name of the center, e.g. PHE
-    taxon_id, str : the taxon id of the organism from NCBI
+    taxon_id, str : the taxon id of the organism fgit checkout -b iss53rom NCBI
     out_dir, str : path to the output directory where all the xml files will be added.
 
     return
@@ -371,30 +371,38 @@ def sample_xml(dir_of_input_data,refname,data_file,center_name,out_dir):
  	'''
 
 	sample_id_and_data = create_dict_with_data(dir_of_input_data,refname,data_file)
-	# print sample_id_and_data
+
+	print "here is the sample_id_and_data dict for sample.xml", sample_id_and_data
+
 	if set(('SAMPLE','TAXON_ID','SCIENTIFIC_NAME','DESCRIPTION')) <= set(sample_id_and_data):
 		sample_set = ET.Element('SAMPLE_SET')
 		sample_scientific_name_description = set(['SAMPLE','TAXON_ID','SCIENTIFIC_NAME','DESCRIPTION'])
 		all_keys_in_a_lits = set(sample_id_and_data.keys())
+		print "all_keys_in_a_lits", all_keys_in_a_lits
 		remaining_keys = all_keys_in_a_lits - sample_scientific_name_description
+		print "remaining_keys", remaining_keys
 
 		for index,sample_name in enumerate(sample_id_and_data["SAMPLE"]):
 			for key in sample_scientific_name_description:
 				field = []
 				field.append(sample_id_and_data[key][index])
+				print "field", field
 				# begin with indentation of the xml file.  start with sample...
 				if key == "SAMPLE":
 					sample = ET.SubElement(sample_set, 'SAMPLE', alias=''.join(field), center_name=center_name)
 					# and then title
 					title = ET.SubElement(sample, "TITLE").text = ''.join(field)
 					sample_name = ET.SubElement(sample, "SAMPLE_NAME")
+					print sample_name
 					# for below only use if you want to update and have isolate ena number
 					# scientific and description are optional.  If they included in the data_file then they will be populated, otherwise they will be left empty.
 				elif key == "TAXON_ID":
 					taxon = ET.SubElement(sample_name, "TAXON_ID").text = ''.join(field)
+					print taxon
 
 				elif key == "SCIENTIFIC_NAME":
 					scientific = ET.SubElement(sample_name, "SCIENTIFIC_NAME").text = ''.join(field)
+					print scientific
 
 				elif key == "DESCRIPTION":
 					desc = ET.SubElement(sample, "DESCRIPTION").text = ''.join(field)
@@ -406,6 +414,7 @@ def sample_xml(dir_of_input_data,refname,data_file,center_name,out_dir):
 				for key in remaining_keys:
 					field = []
 					field.append(sample_id_and_data[key][index])
+					print "field in remaining_keys", field
 					# for below only use if you want to update and have isolate ena number
 					sample_attribute = ET.SubElement(sample_attributes, "SAMPLE_ATTRIBUTE")
 					# tag = ET.SubElement(sample_attribute, "TAG").text = "SAMPLE"
@@ -420,12 +429,14 @@ def sample_xml(dir_of_input_data,refname,data_file,center_name,out_dir):
 	indent(sample_set)
 	# create tree
 	tree = ET.ElementTree(sample_set)
+	xmlstr = ET.tostring(sample_set, encoding='utf8', method='xml')
+	print "xml tree:", xmlstr
 
 	# out_dirput to outfile
 	with open(out_dir+"/sample.xml", 'w') as outfile:
 		tree.write(outfile, xml_declaration=True, encoding='utf-8', method="xml")
 
-	print "\nSuccessfully created sample.xml file\n"
+	# print "\nSuccessfully created sample.xml file\n"
 
 def experiment_xml(dir_of_input_data,data_file,refname,center_name,library_strategy,library_source,library_selection,read_length,read_sdev,instrument_model,out_dir=""):
 	
@@ -454,6 +465,8 @@ def experiment_xml(dir_of_input_data,data_file,refname,center_name,library_strat
 
 	'''
 	sample_id_and_data = create_dict_with_data(dir_of_input_data,refname,data_file)
+
+	print "here is the sample_id_and_data dict for experiment.xml", sample_id_and_data
 	# set the root element
 	experiment_set = ET.Element('EXPERIMENT_SET')
 
@@ -461,6 +474,7 @@ def experiment_xml(dir_of_input_data,data_file,refname,center_name,library_strat
 		print "The ",data_file, "file does not contain a SAMPLE field! Please add a SAMPLE field to proceed"
 		sys.exit(1)
 	else:
+		print "SAMPLE is in the sample_id_and_data dict"
 		for index,isolate in enumerate(sample_id_and_data["SAMPLE"]):
 			experiment = ET.SubElement(experiment_set, 'EXPERIMENT', alias=isolate, center_name=center_name)
 			study_ref = ET.SubElement(experiment, "STUDY_REF", refname=refname, refcenter=center_name)
@@ -491,7 +505,8 @@ def experiment_xml(dir_of_input_data,data_file,refname,center_name,library_strat
 	indent(experiment_set)
 	# create tree
 	tree = ET.ElementTree(experiment_set)
-
+	xmlstr = ET.tostring(experiment_set, encoding='utf8', method='xml')
+	print "xml tree for experiment.xml", xmlstr
 	# out_dirput to outfile
 	with open(out_dir+"/experiment.xml", 'w') as outfile:
 		tree.write(outfile, xml_declaration=True, encoding='utf-8', method="xml")
