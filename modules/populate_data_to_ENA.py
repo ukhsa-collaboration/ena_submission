@@ -49,7 +49,7 @@ def check_data_file(data_file):
 
 
 	"""
-	meta_data_file = file(data_file, 'r')
+	meta_data_file = file(data_file, 'U')
 	# the data file should have this heading...
 	data_file_heading = ['SAMPLE', 'TAXON_ID', 'SCIENTIFIC_NAME', 'DESCRIPTION']
 	for lineNum, line in enumerate(meta_data_file):
@@ -301,7 +301,7 @@ def create_dict_with_data(dir_of_input_data,refname,data_file, delim="\t", heade
 
 	'''
     
-	meta_data_file = file(data_file, 'r')
+	meta_data_file = file(data_file, 'U')
 	cols = {}
 	indexToName = {}
     
