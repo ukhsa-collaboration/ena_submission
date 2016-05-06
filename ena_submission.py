@@ -206,6 +206,10 @@ Merge the remote changes before pushing again
 	
 	return opts
 
+def make_dir_if_not_made(name):
+	if not os.path.exists(name):
+		    os.makedirs(name)
+
 def check_if_flag_is_provided(flag,name,option):
 	if flag is None:
 		print "Checking if", name, "is provided...No!"
@@ -240,8 +244,7 @@ def main(opts):
 	elif opts.do_everything:
 		print "\nYou would like me to upload your files, generate all the xml files needed to submit your data to ENA, and upload the xml files to ENA.\nLet me check if you have provided all the necessary information....\n"
 		# check if output file exists, otherwise create it...
-		if not os.path.exists(opts.out_dir):
-		    os.makedirs(opts.out_dir)
+		
 		check_if_flag_is_provided(opts.ftp_user_name, "ftp_user_name", "-user")
 		check_if_flag_is_provided(opts.ftp_password, "ftp_password", "pass")
 		check_if_flag_is_provided(opts.dir_of_input_data,"dir_of_input_data","-i")
@@ -250,6 +253,7 @@ def main(opts):
 		check_if_flag_is_provided(opts.data_file,"data_file","-f")
 		check_if_flag_is_provided(opts.title_and_abstract_file,"title_and_abstract_file","-a")
 		check_if_flag_is_provided(opts.out_dir,"out_dir","-o")
+		make_dir_if_not_made(opts.out_dir)
 
 		populate_data_to_ENA.check_data_file(opts.data_file)
 		populate_data_to_ENA.check_abstract_file(opts.title_and_abstract_file)
@@ -279,6 +283,7 @@ def main(opts):
 		check_if_flag_is_provided(opts.center_name,"center_name","-c")
 		check_if_flag_is_provided(opts.data_file,"data_file","-f")
 		check_if_flag_is_provided(opts.out_dir,"out_dir","-o")	
+		make_dir_if_not_made(opts.out_dir)
 
 		populate_data_to_ENA.check_data_file(opts.data_file)
 		populate_data_to_ENA.sample_xml(opts.dir_of_input_data,opts.refname,opts.data_file,opts.center_name,opts.out_dir)
@@ -294,6 +299,7 @@ def main(opts):
 		check_if_flag_is_provided(opts.center_name,"center_name","-c")
 		check_if_flag_is_provided(opts.data_file,"data_file","-f")
 		check_if_flag_is_provided(opts.out_dir,"out_dir","-o")
+		make_dir_if_not_made(opts.out_dir)
 
 		populate_data_to_ENA.check_data_file(opts.data_file)
 		populate_data_to_ENA.experiment_xml(opts.dir_of_input_data,opts.data_file,opts.refname,opts.center_name,opts.library_strategy,opts.library_source,opts.library_selection,opts.read_length,opts.read_sdev,opts.instrument_model,opts.out_dir)
@@ -308,6 +314,7 @@ def main(opts):
 		check_if_flag_is_provided(opts.refname,"refname","-r")
 		check_if_flag_is_provided(opts.center_name,"center_name","-c")
 		check_if_flag_is_provided(opts.out_dir,"out_dir","-o")
+		make_dir_if_not_made(opts.out_dir)
 
 		populate_data_to_ENA.run_xml(opts.dir_of_input_data,opts.refname,opts.center_name,opts.filetype,opts.out_dir)
 
@@ -321,6 +328,7 @@ def main(opts):
 		check_if_flag_is_provided(opts.center_name,"center_name","-c")
 		check_if_flag_is_provided(opts.title_and_abstract_file,"title_and_abstract_file","-a")
 		check_if_flag_is_provided(opts.out_dir,"out_dir","-o")
+		make_dir_if_not_made(opts.out_dir)
 
 		populate_data_to_ENA.study_xml(opts.title_and_abstract_file,opts.center_name,opts.refname,opts.out_dir)
 
@@ -333,6 +341,7 @@ def main(opts):
 		check_if_flag_is_provided(opts.refname,"refname","-r")
 		check_if_flag_is_provided(opts.center_name,"center_name","-c")
 		check_if_flag_is_provided(opts.out_dir,"out_dir","-o")
+		make_dir_if_not_made(opts.out_dir)
 
 		populate_data_to_ENA.submission_xml(opts.refname,opts.center_name,opts.out_dir,opts.release,opts.hold_date)
 
