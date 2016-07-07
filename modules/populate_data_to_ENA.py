@@ -425,7 +425,12 @@ def sample_xml(dir_of_input_data,refname,data_file,center_name,out_dir):
 	with open(out_dir+"/sample.xml", 'w') as outfile:
 		tree.write(outfile, xml_declaration=True, encoding='utf-8', method="xml")
 
-	print "\nSuccessfully created sample.xml file\n"
+	print "\nSuccessfullyHello,
+
+Yeah I think 10:30 onwards would be better….more people are hungry for food such as those we will be offering at that time.  People who aren’t are more prepared to eat stuff at lunch if they have already seen what it’s like.
+
+Also I agree, donations are better than sales 
+ created sample.xml file\n"
 
 def experiment_xml(dir_of_input_data,data_file,refname,center_name,library_strategy,library_source,library_selection,read_length,read_sdev,instrument_model,out_dir=""):
 	
