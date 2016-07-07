@@ -11,28 +11,15 @@ import xml.etree.ElementTree
 def set_up_argparse():
 	parser = argparse.ArgumentParser(description="""
 
-	**This tool will take the receipt.xml file (output from the curl command used to submit all files to ENA repository) and create a csv file which will contain all the ENA accession numbers. Use it when you have run the production curl command that will upload the data to ENA" 
-    """)
+	**This tool will take the receipt.xml file (output from the curl command used to submit all files to ENA repository) and create a csv file which will contain all the ENA accession numbers.**""")
 
-	parser.add_argument('--input_receipt_xml_file', '-i', help='please provide the path for the receipt.xml file.',default='required')
+	# parser = argparse.ArgumentParser(epilog="Good luck! If your jobs breaks, don't blame me :-)", add_help=True)
+	
+	parser.add_argument('--input_receipt_xml_file', '-i', help='please provide the path for the receipt.xml file.',default="required")
 	parser.add_argument('--out_dir', '-o', help='please provide the path to the output directory.')
 	opts = parser.parse_args()
 	
 	return opts
-
-def convert(data):
-    """
-    This function converts dict unicode to ascii
-    """
-    if isinstance(data, basestring):
-        return str(data)
-    elif isinstance(data, collections.Mapping):
-        return dict(map(convert, data.iteritems()))
-    elif isinstance(data, collections.Iterable):
-        return type(data)(map(convert, data))
-    else:
-        return data
-
 
 def extract_ena_accession_from_receipt_xml(receipt_xml_file,out_dir):
 
@@ -55,7 +42,7 @@ def extract_ena_accession_from_receipt_xml(receipt_xml_file,out_dir):
     for sample in samples:
     	user_sample_names_and_ENA_numbers[sample.attributes['accession'].value] = sample.attributes['alias'].value
 
-    for key,value in convert(user_sample_names_and_ENA_numbers).items():
+    for key,value in user_sample_names_and_ENA_numbers.items():
 		final_dict[value].append(key)
 
     outfile = open(out_dir+"/"+project_number+"_data.csv", 'w')
