@@ -46,7 +46,7 @@ To upload your files to ENA, you will need the following:
 
   data....
 
-  You may like to use the template file provided in the examples folder.  You might also like to see an example file in the examples folder.
+  You may like to use the template file provided in the examples folder.  You might also like to see an example file in the examples folder. Please note that ENA now check that the Scientific_name should be matching to taxon_id so please make sure you write the correct scientific_name.
 
 3. A text file that contains the title for your project and an abstract explaining the project.  The two columns must be separated by tabs. There are no headings needed here. e.g (see examples in the examples folder):
 
