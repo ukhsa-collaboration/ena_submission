@@ -337,11 +337,14 @@ def create_dict_with_data(dir_of_input_data,refname,data_file, delim="\t", heade
 			x = 0
 			# if the sample name (cells[0]) is in the strain names obtained from the checksums file then add to dict cols 
 			if cells[0] in strain_names:
-				for cell in cells:
-					cell = cell.rstrip()
-					#indexToName[i] is the header name index
-					cols[indexToName[x]] += [cell]
-					x += 1
+				try:
+					for cell in cells:
+						cell = cell.rstrip()
+						#indexToName[i] is the header name index
+						cols[indexToName[x]] += [cell]
+						x += 1
+				except EOFError:
+					print "ERROR: something is wrong with the "+data_file+" file."
 			else:
 				print "ERROR: "+cells[0]+" from the "+data_file+" is not equivalent to the sample name you have labelled your files in"+"".join(strain_names)
 				sys.exit()
@@ -425,12 +428,7 @@ def sample_xml(dir_of_input_data,refname,data_file,center_name,out_dir):
 	with open(out_dir+"/sample.xml", 'w') as outfile:
 		tree.write(outfile, xml_declaration=True, encoding='utf-8', method="xml")
 
-	print "\nSuccessfullyHello,
-
-Yeah I think 10:30 onwards would be better….more people are hungry for food such as those we will be offering at that time.  People who aren’t are more prepared to eat stuff at lunch if they have already seen what it’s like.
-
-Also I agree, donations are better than sales 
- created sample.xml file\n"
+	print "\nSuccessfully created sample.xml file\n"
 
 def experiment_xml(dir_of_input_data,data_file,refname,center_name,library_strategy,library_source,library_selection,read_length,read_sdev,instrument_model,out_dir=""):
 	
