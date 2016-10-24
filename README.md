@@ -38,7 +38,6 @@ To upload your files to ENA, you will need the following:
 
   Otherwise, if you are uploading a different type of file, like bam files or fasta files, you can name them whatever you like but they should have the prefix at the end, e.g. .bam or .fasta.  Use the -F flag to do so, e.g. -F bam.
 
-
 2. A csv (comma separated values) file that contains all the information for each of your samples.  The text file should contain four required columns.  You may add as many columns of data as you wish after the fourth required column.  The columns are separated by commas.  e.g. (note the headings are required as seen below):
 
 
@@ -46,7 +45,7 @@ To upload your files to ENA, you will need the following:
 
   data....
 
-  You may like to use the template file provided in the examples folder.  You might also like to see an example file in the examples folder.
+  You may like to use the template file provided in the examples folder.  You might also like to see an example file in the examples folder. Please note that ENA now check that the Scientific_name should be matching to taxon_id so please make sure you write the correct scientific_name.
 
 3. A text file that contains the title for your project and an abstract explaining the project.  The two columns must be separated by tabs. There are no headings needed here. e.g (see examples in the examples folder):
 
