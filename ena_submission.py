@@ -132,7 +132,13 @@ Merge the remote changes before pushing again
 	  -x sample : use the word 'sample' (same goes for the rest) to create sample.xml only. e.g.|n
 
 	    python ena_submission.py -x sample -i /SOME/PATH/fastqs -r phe_mycoplasma -f /SOME/PATH/data_file_for_ena_submission.txt -c CENTRE_NAME -o /SOME/PATH/ena_submission|n
+	----|n
 
+	To create all xml files:  file:|n
+
+	  -x all : creates sample.xml, experiment.xml, run.xml, study.xml and submission.xml. Note that you need to run the -curl command to submit the data into the ENA test server. e.g.|n
+
+	    python ena_submission.py -x all -i /SOME/PATH/fastqs -r phe_mycoplasma -f /SOME/PATH/data_file_for_ena_submission.txt -c CENTRE_NAME -o /SOME/PATH/ena_submission|n
 	----|n
 	To just create experiment.xml file:|n
 
@@ -181,7 +187,7 @@ Merge the remote changes before pushing again
 
 	# parser = argparse.ArgumentParser(epilog="Good luck! If your jobs breaks, don't blame me :-)", add_help=True)
 	parser.add_argument('--do_everything', '-d', help='This option would run everything in one step, i.e: 1) Create checkums, 2) Uploads files to ENA ftp server, 3) Creats all the XML files, 4) Submits XML files to ENA (test only)',action='store_true')
-	parser.add_argument('--generate_xml_file_for', '-x', help='please provide the name for the xml you like to generate, one of the following:experiment,run,sample,study,submission')
+	parser.add_argument('--generate_xml_file_for', '-x', help='please provide the name for the xml you like to generate, one of the following:all,experiment,run,sample,study,submission')
 	parser.add_argument('--dir_of_input_data', '-i', help='please provide the path for the files you like to upload to ENA. NOTE: the fastq files must be in the following format: *.R1.fastq.gz and *.R2.fastq.gz.')
 	parser.add_argument('--data_file', '-f', help='data_file, file : this text file must have at least four columns seperated by TABS in the following order and with the following headings:  Column 1: SAMPLE, Column 2: TAXON_ID, Column 3: SCIENTIFIC_NAME, Column 4: DESCRIPTION.  If you like to add further data then add it after the DESCRIPTION column.')
 	parser.add_argument('--ftp_user_name', '-user', help='please provide the ftp user name')
@@ -274,6 +280,7 @@ def main(opts):
 		print "All done...Your files have been submitted to the ENA test server. please check if all the files have been uploaded to ENA."
 		# print "All done...please check if all the files have been uploaded to ENA."
 
+
 	elif opts.generate_xml_file_for == "sample":
 
 		print "\nYou would like me to generate the", opts.generate_xml_file_for,".xml file needed to submit your data to ENA....\nLet me check if you have provided all the necessary information....\n"
@@ -346,6 +353,23 @@ def main(opts):
 		populate_data_to_ENA.submission_xml(opts.refname,opts.center_name,opts.out_dir,opts.release,opts.hold_date)
 
 		print "\nYour", opts.generate_xml_file_for,".xml file have been generated successfully in", opts.out_dir
+
+	elif opts.generate_xml_file_for == "all":
+		check_if_flag_is_provided(opts.dir_of_input_data,"dir_of_input_data","-i")
+		check_if_flag_is_provided(opts.refname,"refname","-r")
+		check_if_flag_is_provided(opts.center_name,"center_name","-c")
+		check_if_flag_is_provided(opts.data_file,"data_file","-f")
+		check_if_flag_is_provided(opts.title_and_abstract_file,"title_and_abstract_file","-a")
+		check_if_flag_is_provided(opts.out_dir,"out_dir","-o")	
+		make_dir_if_not_made(opts.out_dir)
+
+		populate_data_to_ENA.check_data_file(opts.data_file)
+		populate_data_to_ENA.sample_xml(opts.dir_of_input_data,opts.refname,opts.data_file,opts.center_name,opts.out_dir)
+		populate_data_to_ENA.experiment_xml(opts.dir_of_input_data,opts.data_file,opts.refname,opts.center_name,opts.library_strategy,opts.library_source,opts.library_selection,opts.read_length,opts.read_sdev,opts.instrument_model,opts.out_dir)
+		populate_data_to_ENA.run_xml(opts.dir_of_input_data,opts.refname,opts.center_name,opts.filetype,opts.out_dir)
+		populate_data_to_ENA.study_xml(opts.title_and_abstract_file,opts.center_name,opts.refname,opts.out_dir)
+		populate_data_to_ENA.submission_xml(opts.refname,opts.center_name,opts.out_dir,opts.hold_date)
+
 	else:
 		print "You need any help?  Use the -h option."
 
