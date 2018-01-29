@@ -35,6 +35,8 @@ To upload your files to ENA, you will need the following:
   MN127.R1.fastq.gz
   
   MN127.R2.fastq.gz
+  
+  If your files end differently (from ".R1.fastq.gz" and ".R2.fastq.gz"), provide the proper files end with --fastq_end option
 
   Otherwise, if you are uploading a different type of file, like bam files or fasta files, you can name them whatever you like but they should have the prefix at the end, e.g. .bam or .fasta.  Use the -F flag to do so, e.g. -F bam.
 
@@ -173,9 +175,12 @@ You should familarise yourself with the other options before you begin running t
                           is needed to generate the study.xml file. The file
                           should be in the following format: full title of the
                           project abstract
-    --center_name CENTER_NAME, -c CENTER_NAME
-                          Please provide the center name
-    --refname REFNAME, -r REFNAME
+    -c "Public Health England", --center_name "Public Health England"
+                          Please provide the center name. The center name is a
+                          controlled vocabulary identifying the sequencing
+                          center, core facility, consortium, or laboratory
+                          responsible for the study.
+    -r PHE_20180125, --refname PHE_20180125
                           Please provide the unique name for the whole
                           submission. This name must not have been used before
                           in any other submission to ENA.
@@ -213,6 +218,13 @@ You should familarise yourself with the other options before you begin running t
     --out_dir OUT_DIR, -o OUT_DIR
                           please provide the path to the output directory which
                           will include all the xml files.
+    --fastq_ends .R1.fastq.gz .R2.fastq.gz
+                          By default, ena_submission.py searches for pair-end
+                          fastq files ending with ".R1.fastq.gz" and
+                          ".R2.fastq.gz". If your fastq files end differently,
+                          you can provide two strings containing the end of
+                          fastq files names (for example, "_1.fastq.gz" and
+                          "_2.fastq.gz")
 
 
 ## Contact
