@@ -43,7 +43,7 @@ To upload your files to ENA, you will need the following:
 2. A csv (comma separated values) file that contains all the information for each of your samples.  The text file should contain four required columns.  You may add as many columns of data as you wish after the fourth required column.  The columns are separated by commas.  e.g. (note the headings are required as seen below):
 
 
-  SAMPLE,TAXON_ID,SCIENTIFIC_NAME,DESCRIPTION
+  sample_name, taxon, organism, description
 
   data....
 
@@ -162,10 +162,10 @@ You should familarise yourself with the other options before you begin running t
     --data_file DATA_FILE, -f DATA_FILE
                           data_file, file : this text file must have at least
                           four columns seperated by TABS in the following order
-                          and with the following headings: Column 1: SAMPLE,
-                          Column 2: TAXON_ID, Column 3: SCIENTIFIC_NAME, Column
-                          4: DESCRIPTION. If you like to add further data then
-                          add it after the DESCRIPTION column.
+                          and with the following headings: Column 1: sample_name,
+                          Column 2: taxon, Column 3: organism,
+                          Column 4: description. If you like to add further data
+                          then add it after the description column.
     --ftp_user_name FTP_USER_NAME, -user FTP_USER_NAME
                           please provide the ftp user name
     --ftp_password FTP_PASSWORD, -pass FTP_PASSWORD
@@ -225,6 +225,15 @@ You should familarise yourself with the other options before you begin running t
                           you can provide two strings containing the end of
                           fastq files names (for example, "_1.fastq.gz" and
                           "_2.fastq.gz")
+    --sample_checklist ERC000029
+                          ENA provides sample checklists which define all the
+                          mandatory and recommended attributes for specific types
+                          of samples. By declaring that you would like to
+                          register your samples using a specific checklist you
+                          are enabling the samples to be validated for
+                          correctness at submission time and are making it easier
+                          for other services to find and access the sample
+                          attribute information.
 
 
 ## Contact

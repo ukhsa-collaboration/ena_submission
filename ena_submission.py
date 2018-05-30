@@ -191,7 +191,11 @@ Merge the remote changes before pushing again
     parser.add_argument('--do_everything', '-d', help='This option would run everything in one step, i.e: 1) Create checkums, 2) Uploads files to ENA ftp server, 3) Creats all the XML files, 4) Submits XML files to ENA (test only)',action='store_true')
     parser.add_argument('--generate_xml_file_for', '-x', help='please provide the name for the xml you like to generate, one of the following:all,experiment,run,sample,study,submission')
     parser.add_argument('--dir_of_input_data', '-i', help='please provide the path for the files you like to upload to ENA. NOTE: the fastq files must be in the following format: *.R1.fastq.gz and *.R2.fastq.gz.')
-    parser.add_argument('--data_file', '-f', help='data_file, file : this text file must have at least four columns seperated by TABS in the following order and with the following headings:  Column 1: SAMPLE, Column 2: TAXON_ID, Column 3: SCIENTIFIC_NAME, Column 4: DESCRIPTION.  If you like to add further data then add it after the DESCRIPTION column.')
+    parser.add_argument('--data_file', '-f',
+                        help='data_file, file : this text file must have at least four columns seperated by TABS in the'
+                             ' following order and with the following headings:  Column 1: sample_name,'
+                             ' Column 2: taxon, Column 3: organism, Column 4: description. If you like to add further'
+                             ' data then add it after the description column.')
     parser.add_argument('--ftp_user_name', '-user', help='please provide the ftp user name')
     parser.add_argument('--ftp_password', '-pass', help='please provide the ftp password')
     parser.add_argument('--title_and_abstract_file', '-a', help='please provide the title and abstract text file.  This is needed to generate the study.xml file.  The file should be in the following format: full title of the project\tabstract')
@@ -231,6 +235,16 @@ Merge the remote changes before pushing again
                              ' "_2.fastq.gz")',
                         required=False,
                         default=['.R1.fastq.gz', '.R2.fastq.gz'])
+    parser.add_argument('--sample_checklist',
+                        type=str,
+                        metavar='ERC000029',
+                        help='ENA provides sample checklists which define all the mandatory and recommended attributes'
+                             ' for specific types of samples. By declaring that you would like to register your samples'
+                             ' using a specific checklist you are enabling the samples to be validated for correctness'
+                             ' at submission time and are making it easier for other services to find and access the'
+                             ' sample attribute information.',
+                        required=False)
+
     opts = parser.parse_args()
 
     # Check --refname only contains one word
@@ -297,7 +311,8 @@ def main(opts):
         populate_data_to_ENA.check_abstract_file(opts.title_and_abstract_file)
         populate_data_to_ENA.create_checksums_file(opts.dir_of_input_data,opts.refname,opts.filetype, opts.fastq_ends)
         populate_data_to_ENA.upload_data_to_ena_ftp_server(opts.dir_of_input_data,opts.refname,opts.ftp_user_name,opts.ftp_password,opts.filetype, opts.fastq_ends)
-        populate_data_to_ENA.sample_xml(opts.dir_of_input_data,opts.refname,opts.data_file,opts.center_name,opts.out_dir, opts.fastq_ends)
+        populate_data_to_ENA.sample_xml(opts.dir_of_input_data, opts.refname, opts.data_file, opts.center_name,
+                                        opts.out_dir, opts.fastq_ends, opts.sample_checklist)
         populate_data_to_ENA.experiment_xml(opts.dir_of_input_data,opts.data_file,opts.refname,opts.center_name,opts.library_strategy,opts.library_source,opts.library_selection,opts.read_length,opts.read_sdev,opts.instrument_model, opts.fastq_ends, opts.out_dir)
         populate_data_to_ENA.run_xml(opts.dir_of_input_data,opts.refname,opts.center_name,opts.filetype,opts.out_dir, opts.fastq_ends)
         populate_data_to_ENA.study_xml(opts.title_and_abstract_file,opts.center_name,opts.refname,opts.out_dir)
@@ -325,7 +340,8 @@ def main(opts):
         make_dir_if_not_made(opts.out_dir)
 
         populate_data_to_ENA.check_data_file(opts.data_file)
-        populate_data_to_ENA.sample_xml(opts.dir_of_input_data,opts.refname,opts.data_file,opts.center_name,opts.out_dir, opts.fastq_ends)
+        populate_data_to_ENA.sample_xml(opts.dir_of_input_data, opts.refname, opts.data_file, opts.center_name,
+                                        opts.out_dir, opts.fastq_ends, opts.sample_checklist)
 
         print "\nYour", opts.generate_xml_file_for,".xml file have been generated successfully in", opts.out_dir
 
@@ -396,7 +412,8 @@ def main(opts):
         make_dir_if_not_made(opts.out_dir)
 
         populate_data_to_ENA.check_data_file(opts.data_file)
-        populate_data_to_ENA.sample_xml(opts.dir_of_input_data,opts.refname,opts.data_file,opts.center_name,opts.out_dir, opts.fastq_ends)
+        populate_data_to_ENA.sample_xml(opts.dir_of_input_data, opts.refname, opts.data_file, opts.center_name,
+                                        opts.out_dir, opts.fastq_ends, opts.sample_checklist)
         populate_data_to_ENA.experiment_xml(opts.dir_of_input_data,opts.data_file,opts.refname,opts.center_name,opts.library_strategy,opts.library_source,opts.library_selection,opts.read_length,opts.read_sdev,opts.instrument_model, opts.fastq_ends, opts.out_dir)
         populate_data_to_ENA.run_xml(opts.dir_of_input_data,opts.refname,opts.center_name,opts.filetype,opts.out_dir, opts.fastq_ends)
         populate_data_to_ENA.study_xml(opts.title_and_abstract_file,opts.center_name,opts.refname,opts.out_dir)

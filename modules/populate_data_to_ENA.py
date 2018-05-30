@@ -1,35 +1,36 @@
 #!/usr/bin/env python
 
-'''
+"""
 populate_data_to_ENA.py
 
 
 AAlShahib_Aug_2015
 
-'''
+"""
+
 import xml.etree.cElementTree as ET
-from xml.dom import minidom
-import csv
 import sys
 import hashlib
 import glob
 import os
 import ftplib
 import subprocess
+# from xml.dom import minidom
+# import csv
 
 
 def check_file_exists(filepath, file_description):
     """
-	A function to check if a file exists.
-	It will print out an error message and exit if the file is not found
+    A function to check if a file exists.
+    It will print out an error message and exit if the file is not found
 
-	Params
-	----------
-	filepath : String
-	    the path to the file to be checked
-	file_description : String
-	    a description of the file to be checked e.g "config file"
-	"""
+    Params
+    ----------
+    filepath : String
+        the path to the file to be checked
+    file_description : String
+        a description of the file to be checked e.g "config file"
+    """
     if not os.path.exists(filepath):
         print("The " + file_description + " (" + filepath + ") does not exist")
         sys.exit(1)
@@ -37,21 +38,19 @@ def check_file_exists(filepath, file_description):
 
 def check_data_file(data_file):
     """
-	A function to check whether the data input file is in the right format or not.
+    A function to check whether the data input file is in the right format or not.
 
-	Params
+    Params
     ------
     data_file, str: file (as a path) containing the meta data for the project.
 
     return
     ------
     None
-
-
-	"""
+    """
     meta_data_file = file(data_file, 'U')
     # the data file should have this heading...
-    data_file_heading = ['SAMPLE', 'TAXON_ID', 'SCIENTIFIC_NAME', 'DESCRIPTION']
+    data_file_heading = ['sample_name', 'taxon', 'organism', 'description']
     for lineNum, line in enumerate(meta_data_file):
         if lineNum == 0:
             headings_stripped = line.strip()
@@ -63,29 +62,30 @@ def check_data_file(data_file):
                         data_file_heading[2] and headings[3] == data_file_heading[3]:
                     print "Checking if data_file header order is correct....Yes"
                 else:
-                    print "ERROR: The ORDER of the headers in the " + data_file + " file is incorrect.  You must have the following order: SAMPLE,TAXON_ID,SCIENTIFIC_NAME,DESCRIPTION."
+                    print "ERROR: The ORDER of the headers in the {data_file} file is incorrect. You must have the" \
+                          " following order: sample_name, taxon, organism, description.".format(data_file=data_file)
                     sys.exit()
             else:
-                print "ERROR: The headers in the " + data_file + " file are incorrect.  You must have the following data headers: SAMPLE,TAXON_ID,SCIENTIFIC_NAME,DESCRIPTION."
+                print "ERROR: The headers in the {data_file} file are incorrect.  You must have the following data" \
+                      " headers: sample_name, taxon, organism, description.".format(data_file=data_file)
                 sys.exit()
 
 
 def check_abstract_file(title_and_abstract_file):
-    '''
-	check_abstract_file(title_and_abstract_file)
+    """
+    check_abstract_file(title_and_abstract_file)
 
-	A function to check whether the title and abstract function is in the correct format.
+    A function to check whether the title and abstract function is in the correct format.
 
 
-	Params
+    Params
     ------
     title_and_abstract_file, str: file (as a path) containing title and abstract of the project.
 
     return
     ------
     None
-
-	'''
+    """
     try:
         with open(title_and_abstract_file, 'U') as f:
             lines = f.readlines()
@@ -93,10 +93,13 @@ def check_abstract_file(title_and_abstract_file):
                 cols = line.decode('utf-8').strip().split('\t')
                 title = cols[0]
                 abstract = cols[1]
+                del title, abstract
         print "Checking if title and abstract file is in the correct format....Yes"
-    except:
-        print "Something is wrong with the title and abstract file " + title_and_abstract_file + ". It should have a title with a tab separator and abstract.  The file should only have one line. Please check and re-submit."
-        sys.exit()
+    except Exception as e:
+        print "Something is wrong with the title and abstract file {title_and_abstract_file}. It should have a title" \
+              " with a tab separator and abstract.  The file should only have one line. Please check and" \
+              " re-submit.".format(title_and_abstract_file=title_and_abstract_file)
+        sys.exit(e)
 
 
 def rchop(string, ending):
@@ -121,24 +124,27 @@ def rchop(string, ending):
 
 
 def create_checksums_file(dir_of_input_data, refname, filetype, fastq_ends):
-    '''
-	create_checksums_file(dir_of_input_data,refname)
+    """
+    create_checksums_file(dir_of_input_data,refname)
 
-	This function creates the checksum file of all the files to be submitted to ENA.  The fastq files MUST begin with the sample name and end with R1.fastq.gz or R2.fastq.gz and must be seperated by dots, e.g. my_sample.whatever.R1.fastq.gz
+    This function creates the checksum file of all the files to be submitted to ENA.  The fastq files MUST begin with
+    the sample name and end with R1.fastq.gz or R2.fastq.gz and must be seperated by dots,
+    e.g. my_sample.whatever.R1.fastq.gz
 
-	Params
+    Params
     ------
-    dir_of_input_data, dir: This is the directory that contains all the files to be uploaded to ENA.  NOTE: the fastq files must be in the following format: *.R1.fastq.gz and *.R2.fastq.gz.
+    dir_of_input_data, dir: This is the directory that contains all the files to be uploaded to ENA.  NOTE: the fastq
+                            files must be in the following format: *.R1.fastq.gz and *.R2.fastq.gz.
     refname, str: You must provide a reference name for your study, e.g. phe_ecoli
     filetype, str: Type of files to submit, e.g. 'fastq'
     fastq_ends, tuple: Tuple of strings of size 2 with fastq files end, e.g. ('.R1.fastq.gz', '.R2.fastq.gz')
 
     return
     ------
+    checksums_file, file : a checksum file will be created in the dir_of_input_data directory.
+                           It would be called: refname_"checksums.md5".
 
-    checksums_file, file : a checksum file will be created in the dir_of_input_data directory.  It would be called: refname_"checksums.md5".
-
-	'''
+    """
     try:
         if filetype == "fastq":
             files = glob.glob(dir_of_input_data + "/*" + fastq_ends[0])
@@ -148,7 +154,9 @@ def create_checksums_file(dir_of_input_data, refname, filetype, fastq_ends):
             num_files = len(files)
 
         if not files:
-            print "The files in " + dir_of_input_data + " do not match the prefix.  Please check and try again. Note: if you are uploading other than fastq files please use the -F option to specify the prefix of your files, e.g. -F bam."
+            print "The files in {dir_of_input_data} do not match the prefix. Please check and try again. Note: if you" \
+                  " are uploading other than fastq files please use the -F option to specify the prefix of your" \
+                  " files, e.g. -F bam.".format(dir_of_input_data=dir_of_input_data)
             sys.exit()
 
         # find out if checksums has already been done first
@@ -156,14 +164,14 @@ def create_checksums_file(dir_of_input_data, refname, filetype, fastq_ends):
             checksums_file = open(dir_of_input_data + '/' + refname + '_checksums.md5', "w")
 
             print "creating checksums....."
-            for file in files:
-                (SeqDir, seqFileName_R1) = os.path.split(file)
+            for file_found in files:
+                (SeqDir, seqFileName_R1) = os.path.split(file_found)
                 # get the sample name
                 if filetype == "fastq":
                     sample_name = rchop(seqFileName_R1, fastq_ends[0])
                 else:
                     sample_name = seqFileName_R1.split('.')[0]
-                checksum_main = hashlib.md5(open(file, 'rb').read()).hexdigest()
+                checksum_main = hashlib.md5(open(file_found, 'rb').read()).hexdigest()
                 checksums_file.write(checksum_main + " " + seqFileName_R1 + "\n")
                 if filetype == "fastq":
                     read_2_file = ''.join(glob.glob(SeqDir + "/" + sample_name + fastq_ends[1]))
@@ -172,7 +180,7 @@ def create_checksums_file(dir_of_input_data, refname, filetype, fastq_ends):
                     checksums_file.write(checksum_read2 + " " + seqFileName_R2 + "\n")
             print "created checksums file.  It's located in " + dir_of_input_data + '/' + refname + '_checksums.md5'
         else:
-            num_lines_in_checksums_file = sum(1 for line in open(dir_of_input_data + '/' + refname + '_checksums.md5'))
+            num_lines_in_checksums_file = sum(1 for _ in open(dir_of_input_data + '/' + refname + '_checksums.md5'))
 
             if num_lines_in_checksums_file == num_files:
                 print "\nChecksums file has already been generated and fully populated!"
@@ -182,33 +190,31 @@ def create_checksums_file(dir_of_input_data, refname, filetype, fastq_ends):
 
 
 def upload_data_to_ena_ftp_server(dir_of_input_data, refname, ftp_user_name, ftp_password, filetype, fastq_ends):
-    '''
-	upload_data_to_ena_ftp_server(dir_of_input_data,refname,ftp_user_name,ftp_password)
+    """
+    upload_data_to_ena_ftp_server(dir_of_input_data,refname,ftp_user_name,ftp_password)
 
-	This function uploads the data to the ena ftp server.
+    This function uploads the data to the ena ftp server.
 
-	Params
+    Params
     ------
-    dir_of_input_data, dir: This is the directory that contains all the files to be uploaded to ENA.  NOTE: the fastq files must be in the following format: *.R1.fastq.gz and *.R2.fastq.gz.
+    dir_of_input_data, dir: This is the directory that contains all the files to be uploaded to ENA.  NOTE: the fastq
+                            files must be in the following format: *.R1.fastq.gz and *.R2.fastq.gz.
     refname, str: You must provide a reference name for your study, e.g. phe_ecoli
     ftp_user_name, str: You must provide your ENA ftp username, e.g. Webin-40432
     ftp_password, str: You must provide your ENA ftp password
     fastq_ends, tuple: Tuple of strings of size 2 with fastq files end, e.g. ('.R1.fastq.gz', '.R2.fastq.gz')
 
     return
-    ------
-	
-	None
-
-	'''
+    ------   
+    None
+    """
 
     try:
         print "\nconnecting to ftp.webin.ebi.ac.uk...."
         ftp = ftplib.FTP("webin.ebi.ac.uk", ftp_user_name, ftp_password)
-    except IOError:
-        print(ftp.lastErrorText())
+    except ftplib.all_errors as e:
         print "ERROR: could not connect to the ftp server.  Please check your login details."
-        sys.exit()
+        sys.exit(e)
 
     # print ftp.sendcmd('SITE CHMOD 644 ' + ftp.cwd())
     print "\nSuccess!\n"
@@ -230,7 +236,9 @@ def upload_data_to_ena_ftp_server(dir_of_input_data, refname, ftp_user_name, ftp
         ftp.storbinary('STOR ' + refname + '_checksums.md5', checksum_file)  # send the file
         checksum_file.close()
     except IOError:
-        print "ERROR: could not find the checksum file.  I'm looking for", dir_of_input_data + '/' + refname + '_checksums.md5'
+        print "ERROR: could not find the checksum file." \
+              " I'm looking for {dir_of_input_data}/{refname}_checksums.md5".format(dir_of_input_data=dir_of_input_data,
+                                                                                    refname=refname)
         sys.exit()
 
     print "Now uploading all the data to ENA ftp server in the", refname, "directory\n"
@@ -249,21 +257,23 @@ def upload_data_to_ena_ftp_server(dir_of_input_data, refname, ftp_user_name, ftp
             else:
                 files = glob.glob(dir_of_input_data + "/" + "*." + filetype)
 
-            for file in files:
+            for file_found in files:
 
-                (SeqDir, seqFileName) = os.path.split(file)
-                # if the sample has already been uploaded, check the file size number. If its the same as the dir file size then move on otherwise upload it again.
+                (SeqDir, seqFileName) = os.path.split(file_found)
+                # if the sample has already been uploaded, check the file size number. If its the same as the dir file
+                # size then move on otherwise upload it again.
                 if seqFileName in ftp.nlst():
-                    fileSize_in_ftp = ftp.size(seqFileName)
-                    fileSize_in_dir = os.path.getsize(str(file))
-                    if fileSize_in_dir != fileSize_in_ftp:
-                        print seqFileName + " is uploaded but not all of it so uploading it again now to ENA ftp server.\n"
-                        ftp.storbinary('STOR ' + seqFileName, open(file, 'rb'))
+                    file_size_in_ftp = ftp.size(seqFileName)
+                    file_size_in_dir = os.path.getsize(str(file_found))
+                    if file_size_in_dir != file_size_in_ftp:
+                        print "{seqFileName} is uploaded but not all of it so uploading it again now to ENA ftp" \
+                              " server.\n".format(seqFileName=seqFileName)
+                        ftp.storbinary('STOR ' + seqFileName, open(file_found, 'rb'))
                     else:
                         print seqFileName + " has already been uploaded.\n"
                 else:
-                    print "uploading", file, "to ENA ftp server.\n"
-                    ftp.storbinary('STOR ' + seqFileName, open(file, 'rb'))
+                    print "uploading", file_found, "to ENA ftp server.\n"
+                    ftp.storbinary('STOR ' + seqFileName, open(file_found, 'rb'))
             break
         except Exception as e:
             print(e)
@@ -276,21 +286,19 @@ def upload_data_to_ena_ftp_server(dir_of_input_data, refname, ftp_user_name, ftp
 
 
 def indent(elem, level=0):
-    '''
-	indent(elem, level=0)
+    """
+    indent(elem, level=0)
 
-	This function indents the xml files to the appropriate indentations.
+    This function indents the xml files to the appropriate indentations.
 
-	Params
+    Params
     ------
     elem, ET.Element object.
 
     return
     ------
-	
-	ET.Element object: indented ET.Element object.
-
-	'''
+    ET.Element object: indented ET.Element object.
+    """
 
     i = "\n" + level * "  "
     if len(elem):
@@ -308,30 +316,34 @@ def indent(elem, level=0):
 
 
 def create_dict_with_data(dir_of_input_data, refname, data_file, fastq_ends, header=True):
-    '''
-	create_dict_with_data(dir_of_input_data,refname,data_file)
+    """
+    create_dict_with_data(dir_of_input_data,refname,data_file)
 
-	This function uses the data file provided and creates a dictionary to be used to create some xml files. The order of the rows is respected.
+    This function uses the data file provided and creates a dictionary to be used to create some xml files. The order
+    of the rows is respected.
 
-	Params
-	------
-	dir_of_input_data, dir: This is the directory that contains all the files to be uploaded to ENA.  NOTE: the fastq files must be in the following format: *.R1.fastq.gz and *.R2.fastq.gz.
-	refname, str: You must provide a reference name for your study, e.g. phe_ecoli
-	data_file, file : this csv file must have at least three columns seperated by commas in the following order and with the following headings:  Column 1: SAMPLE, Column 2: TAXON_ID, Column 3: SCIENTIFIC_NAME, Column 4: DESCRIPTION.  If you like to add further data then add it after the DESCRIPTION column.
-	header, True or False :  if True the first line will be considered a header line
+    Params
+    ------
+    dir_of_input_data, dir: This is the directory that contains all the files to be uploaded to ENA.
+                            NOTE: the fastq files must be in the following format: *.R1.fastq.gz and *.R2.fastq.gz.
+    refname, str: You must provide a reference name for your study, e.g. phe_ecoli
+    data_file, file : this csv file must have at least three columns seperated by commas in the following order and
+                      with the following headings:  Column 1: sample_name, Column 2: taxon, Column 3: organism,
+                      Column 4: description.  If you like to add further data then add it after the description column.
+    header, True or False :  if True the first line will be considered a header line
     fastq_ends, tuple: Tuple of strings of size 2 with fastq files end, e.g. ('.R1.fastq.gz', '.R2.fastq.gz')
 
 
-	return
-	------
+    return
+    ------
 
-	sample_id_and_data, dict : a dictionary that has the headings as keys and the data as values.
+    sample_id_and_data, dict : a dictionary that has the headings as keys and the data as values.
 
-	'''
+    """
 
     meta_data_file = file(data_file, 'U')
     cols = {}
-    indexToName = {}
+    index_to_name = {}
 
     with open(dir_of_input_data + '/' + refname + '_checksums.md5', 'rb') as f:
         sample_id_and_data = []
@@ -355,24 +367,26 @@ def create_dict_with_data(dir_of_input_data, refname, data_file, fastq_ends, hea
                 heading = heading.strip()
                 if header:
                     cols[heading] = []
-                    indexToName[i] = heading
+                    index_to_name[i] = heading
                 else:
                     # in this case the heading is actually just a cell
                     cols[i] = [heading]
-                    indexToName[i] = i
+                    index_to_name[i] = i
                 i += 1
         else:
             strip_line = line.strip()
-            # cells is a list of each of the lines in the data file, e.g. ['ST38_21', '562', 'Escherichia coli', 'OXA-48 producer', 'North West_3', '28_2014']
+            # cells is a list of each of the lines in the data file,
+            # e.g. ['ST38_21', '562', 'Escherichia coli', 'OXA-48 producer', 'North West_3', '28_2014']
             cells = strip_line.split('\t')
             x = 0
-            # if the sample name (cells[0]) is in the strain names obtained from the checksums file then add to dict cols
+            # if the sample name (cells[0]) is in the strain names obtained from the checksums file then add to dict
+            # cols
             if cells[0] in strain_names:
                 try:
                     for cell in cells:
                         cell = cell.rstrip()
                         # indexToName[i] is the header name index
-                        cols[indexToName[x]] += [cell]
+                        cols[index_to_name[x]] += [cell]
                         x += 1
                 except EOFError:
                     print "ERROR: something is wrong with the " + data_file + " file."
@@ -385,73 +399,93 @@ def create_dict_with_data(dir_of_input_data, refname, data_file, fastq_ends, hea
     return cols
 
 
-def sample_xml(dir_of_input_data, refname, data_file, center_name, out_dir, fastq_ends):
-    '''
-	create_checksums_file(dir_of_input_data,refname)
+def sample_xml(dir_of_input_data, refname, data_file, center_name, out_dir, fastq_ends, sample_checklist):
+    """
+    create_checksums_file(dir_of_input_data,refname)
 
-	This function creates the checksum file of all the files to be submitted to ENA.
+    This function creates the checksum file of all the files to be submitted to ENA.
 
-	Params
+    Params
     ------
     dir_of_input_data, dir: This is the directory that contains all the files to be uploaded to ENA.
-    data_file, file : this text file must have at least three columns seperated by commas in the following order and with the following headings:  Column 1: SAMPLE, Column 2: TAXON_ID, Column 3: SCIENTIFIC_NAME, Column 4: DESCRIPTION.  If you like to add further data then add it after the DESCRIPTION column.
+    data_file, file : this text file must have at least three columns seperated by commas in the following order and
+                      with the following headings:  Column 1: sample_name, Column 2: taxon, Column 3: organism,
+                      Column 4: description. If you like to add further data then add it after the description column.
     refname, str: You must provide a reference name for your study, e.g. phe_ecoli
     center_name, str : name of the center, e.g. PHE
     taxon_id, str : the taxon id of the organism from NCBI
     out_dir, str : path to the output directory where all the xml files will be added.
     fastq_ends, tuple: Tuple of strings of size 2 with fastq files end, e.g. ('.R1.fastq.gz', '.R2.fastq.gz')
+    sample_checklist, str : ENA sample checklist which define all the mandatory and recommended attributes for specific
+                            types of samples.
 
     return
     ------
-
     outfile, file : a sample xml file needed for ENA submission.
-
- 	'''
+    """
 
     sample_id_and_data = create_dict_with_data(dir_of_input_data, refname, data_file, fastq_ends)
-    if set(('SAMPLE', 'TAXON_ID', 'SCIENTIFIC_NAME', 'DESCRIPTION')) <= set(sample_id_and_data):
+    if {'sample_name', 'taxon', 'organism', 'description'} <= set(sample_id_and_data):
         sample_set = ET.Element('SAMPLE_SET')
-        sample_scientific_name_description = set(['SAMPLE', 'TAXON_ID', 'SCIENTIFIC_NAME', 'DESCRIPTION'])
+        sample_scientific_name_description = {'sample_name', 'taxon', 'organism', 'description'}
         all_keys_in_a_lits = set(sample_id_and_data.keys())
         remaining_keys = all_keys_in_a_lits - sample_scientific_name_description
 
-        for index, sample_name in enumerate(sample_id_and_data["SAMPLE"]):
+        for index, sample_name in enumerate(sample_id_and_data["sample_name"]):
             for key in sample_scientific_name_description:
-                field = []
-                field.append(sample_id_and_data[key][index])
+                field = [sample_id_and_data[key][index]]
                 # begin with indentation of the xml file.  start with sample...
-                if key == "SAMPLE":
+                if key == "sample_name":
                     sample = ET.SubElement(sample_set, 'SAMPLE', alias=''.join(field), center_name=center_name)
                     # and then title
                     title = ET.SubElement(sample, "TITLE").text = ''.join(field)
+                    del title
                     sample_name = ET.SubElement(sample, "SAMPLE_NAME")
                 # for below only use if you want to update and have isolate ena number
-                # scientific and description are optional.  If they included in the data_file then they will be populated, otherwise they will be left empty.
-                elif key == "TAXON_ID":
+                # scientific and description are optional.  If they included in the data_file then they will be
+                # populated, otherwise they will be left empty.
+                elif key == "taxon":
                     taxon = ET.SubElement(sample_name, "TAXON_ID").text = ''.join(field)
+                    del taxon
 
-                elif key == "SCIENTIFIC_NAME":
+                elif key == "organism":
                     scientific = ET.SubElement(sample_name, "SCIENTIFIC_NAME").text = ''.join(field)
+                    del scientific
 
-                elif key == "DESCRIPTION":
+                elif key == "description":
                     desc = ET.SubElement(sample, "DESCRIPTION").text = ''.join(field)
+                    del desc
 
             # only add sample attributes if required
             if len(remaining_keys) > 0:
                 sample_attributes = ET.SubElement(sample, "SAMPLE_ATTRIBUTES")
 
                 for key in remaining_keys:
-                    field = []
-                    field.append(sample_id_and_data[key][index])
+                    field = [sample_id_and_data[key][index]]
                     # for below only use if you want to update and have isolate ena number
                     sample_attribute = ET.SubElement(sample_attributes, "SAMPLE_ATTRIBUTE")
                     # tag = ET.SubElement(sample_attribute, "TAG").text = "SAMPLE"
                     # value = ET.SubElement(sample_attribute, "VALUE").text = str(sample_name)
                     tag = ET.SubElement(sample_attribute, "TAG").text = str(key)
                     value = ET.SubElement(sample_attribute, "VALUE").text = ''.join(field)
+                    del tag, value
                 # use the indent function to indent the xml file
+
+                if sample_checklist is not None:
+                    # The Sample Checklists
+                    # ENA provides sample checklists which define all the mandatory and recommended attributes for
+                    # specific types of samples. By declaring that you would like to register your samples using a
+                    # specific checklist you are enabling the samples to be validated for correctness at submission
+                    # time and are making it easier for other services to find and access the sample attribute
+                    # information.
+                    sample_attribute = ET.SubElement(sample_attributes, "SAMPLE_ATTRIBUTE")
+                    _ = ET.SubElement(sample_attribute, 'TAG').text = 'ENA-CHECKLIST'
+                    _ = ET.SubElement(sample_attribute, 'VALUE').text = sample_checklist
+
     else:
-        print "ERROR: The " + data_file + " file does not contain one of the following fields: SAMPLE, TAXON_ID, SCIENTIFIC_NAME, DESCRIPTION. Please add the relevant field to proceed...."
+        print "ERROR: The {data_file} file does not contain one of the following fields:" \
+              " sample_name, taxon, organism, description." \
+              " Please add the relevant field to proceed....".format(data_file=data_file)
         sys.exit(1)
     # print sample_id_and_data
     indent(sample_set)
@@ -467,16 +501,21 @@ def sample_xml(dir_of_input_data, refname, data_file, center_name, out_dir, fast
 
 def experiment_xml(dir_of_input_data, data_file, refname, center_name, library_strategy, library_source,
                    library_selection, read_length, read_sdev, instrument_model, fastq_ends, out_dir=""):
-    '''
-	experiment_xml(dir_of_input_data,data_file,refname,center_name,library_strategy,library_source,library_selection,read_length,read_sdev,instrument_model,out_dir=""):
-	This function generates a experiment xml file needed for submission of data to ENA.  It will contain a subelement for each sample provided in the data_file.
+    """
+    experiment_xml(dir_of_input_data,data_file,refname,center_name,library_strategy,library_source,library_selection,
+                   read_length,read_sdev,instrument_model,out_dir=""):
+    This function generates a experiment xml file needed for submission of data to ENA. It will contain a subelement
+    for each sample provided in the data_file.
 
-	Params
-	------
-	dir_of_input_data, dir: This is the directory that contains all the files to be uploaded to ENA.
-	data_file, file : this text file must have at least three columns seperated by commas in the following order and with the following headings:  Column 1: SAMPLE, Column 2: TAXON_ID, Column 3: SCIENTIFIC_NAME, Column 4: DESCRIPTION.  If you like to add further data then add it after the DESCRIPTION column.
+    Params
+    ------
+    dir_of_input_data, dir: This is the directory that contains all the files to be uploaded to ENA.
+    data_file, file : this text file must have at least three columns seperated by commas in the following order and
+               with the following headings:  Column 1: sample_name, Column 2: taxon, Column 3: organism,
+               Column 4: description. If you like to add further data then add it after the description column.
     center_name, str : name of the center, e.g. PHE
-    refname, str: A unique name for the whole submission. This name must not have been used before in any other submission to ENA.
+    refname, str: A unique name for the whole submission. This name must not have been used before in any other
+                  submission to ENA.
     library_strategy, str : default 'WGS'.
     library_source, str : default 'GENOMIC'
     library_selection, str : default 'RANDOM'
@@ -488,19 +527,18 @@ def experiment_xml(dir_of_input_data, data_file, refname, center_name, library_s
 
     return
     ------
-
     outfile, file : a experiment xml file needed for ENA submission.
+    """
 
-	'''
     sample_id_and_data = create_dict_with_data(dir_of_input_data, refname, data_file, fastq_ends)
     # set the root element
     experiment_set = ET.Element('EXPERIMENT_SET')
 
-    if "SAMPLE" not in sample_id_and_data:
-        print "The ", data_file, "file does not contain a SAMPLE field! Please add a SAMPLE field to proceed"
+    if "sample_name" not in sample_id_and_data:
+        print "The ", data_file, "file does not contain a sample_name field! Please add a sample_name field to proceed"
         sys.exit(1)
     else:
-        for index, isolate in enumerate(sample_id_and_data["SAMPLE"]):
+        for index, isolate in enumerate(sample_id_and_data["sample_name"]):
             experiment = ET.SubElement(experiment_set, 'EXPERIMENT', alias=isolate, center_name=center_name)
             study_ref = ET.SubElement(experiment, "STUDY_REF", refname=refname, refcenter=center_name)
             # indent
@@ -526,6 +564,8 @@ def experiment_xml(dir_of_input_data, data_file, refname, center_name, library_s
             # dedent
             processing = ET.SubElement(experiment, "PROCESSING")
 
+            del study_ref, design_description, sample_descriptor, library_name, paired, processing
+
     # use the indent function to indent the xml file
     indent(experiment_set)
     # create tree
@@ -539,26 +579,25 @@ def experiment_xml(dir_of_input_data, data_file, refname, center_name, library_s
 
 
 def run_xml(dir_of_input_data, refname, center_name, filetype, out_dir, fastq_ends):
-    '''
-	run_xml(dir_of_input_data,refname,center_name,filetype,out_dir):
-	
-	This function generates a run.xml file needed for submission of data to ENA.
+    """
+    run_xml(dir_of_input_data,refname,center_name,filetype,out_dir):
+    
+    This function generates a run.xml file needed for submission of data to ENA.
 
-	Params
+    Params
     ------
     dir_of_input_data, dir: This is the directory that contains all the files to be uploaded to ENA.
     center_name, str : name of the center.  Default is PHE
-    refname, str: A unique name for the whole submission. This name must not have been used before in any other submission to ENA.
+    refname, str: A unique name for the whole submission. This name must not have been used before in any other
+                  submission to ENA.
     filetype, str: the default is fastq.
     out_dir, str : name of the new xml file
     fastq_ends, tuple: Tuple of strings of size 2 with fastq files end, e.g. ('.R1.fastq.gz', '.R2.fastq.gz')
 
     return
     ------
-
     outfile, file : a run.xml file needed for ENA submission.
-
-	'''
+    """
 
     run_set = ET.Element('RUN_SET')
 
@@ -588,8 +627,9 @@ def run_xml(dir_of_input_data, refname, center_name, filetype, out_dir, fastq_en
                                       filename=refname + "/" + read1[1], filetype=filetype)
                 file2 = ET.SubElement(files, 'FILE', checksum=checksum_read2, checksum_method="MD5",
                                       filename=refname + "/" + read2[1], filetype=filetype)
+                del experiment_ref, file1, file2
             else:
-                sys.exit("ERROR: no second read found for", sample_name)
+                sys.exit("ERROR: no second read found for {sample_name}".format(sample_name=sample_name))
 
             # use the indent function to indent the xml file
     indent(run_set)
@@ -604,25 +644,25 @@ def run_xml(dir_of_input_data, refname, center_name, filetype, out_dir, fastq_en
 
 
 def study_xml(title_and_abstract_file, center_name, refname, out_dir):
-    '''
-	study_xml(title_and_abstract_file,center_name,refname,center_project_name,out_dir):
-	
-	This function generates a study.xml file needed for submission of data to ENA.
+    """
+    study_xml(title_and_abstract_file,center_name,refname,center_project_name,out_dir):
+    
+    This function generates a study.xml file needed for submission of data to ENA.
 
-	Params
+    Params
     ------
-    title_and_abstract_file, file: This file should contain two coloumns seperated by tabs.  Column 1 is the title of the work and column 2 is the abstract.  Do not add headings.
+    title_and_abstract_file, file: This file should contain two coloumns seperated by tabs. Column 1 is the title of
+                                   the work and column 2 is the abstract.  Do not add headings.
     center_name, str : name of the center.  Default is PHE
-    refname, str: A unique name for the whole submission. This name must not have been used before in any other submission to ENA.
+    refname, str: A unique name for the whole submission. This name must not have been used before in any other
+                  submission to ENA.
     center_project_name, str: provide a centre project name, default = PHE_SCIENTIFIC_PROJECT
     out_dir, str : name of the new xml file
 
     return
     ------
-
     outfile, file : a study.xml file needed for ENA submission.
-
-	'''
+    """
 
     study_set = ET.Element('STUDY_SET')
     try:
@@ -641,6 +681,7 @@ def study_xml(title_and_abstract_file, center_name, refname, out_dir):
                 study_title = ET.SubElement(descriptor, 'STUDY_TITLE').text = str(title)
                 study_type = ET.SubElement(descriptor, 'STUDY_TYPE', existing_study_type="Whole Genome Sequencing")
                 study_abstract = ET.SubElement(descriptor, 'STUDY_ABSTRACT').text = abstract
+                del study_title, study_type, study_abstract
     except EOFError:
         print "problem with the title and abstract file!"
         sys.exit()
@@ -657,26 +698,27 @@ def study_xml(title_and_abstract_file, center_name, refname, out_dir):
 
 
 def submission_xml(refname, center_name, out_dir, release=False, hold_date=''):
-    '''
-	submission_xml(refname,center_name,out_dir,release,hold_date='')
-	
-	This function generates a submission.xml file needed for submission of data to ENA. It is the final of the five xml files needed.
+    """
+    submission_xml(refname,center_name,out_dir,release,hold_date='')
+    
+    This function generates a submission.xml file needed for submission of data to ENA. It is the final of the five xml
+    files needed.
 
-	Params
+    Params
     ------
     center_name, str : name of the center.  Default is PHE
-    refname, str: A unique name for the whole submission. This name must not have been used before in any other submission to ENA.
+    refname, str: A unique name for the whole submission. This name must not have been used before in any other
+                  submission to ENA.
     center_project_name, str: provide a centre project name, default = PHE_SCIENTIFIC_PROJECT
-    release, True or False: If True then the data would be immediatley available publicly.  If FALSE then it would be held for a default of 2 years privately.
+    release, bol: If True then the data would be immediatley available publicly. If FALSE then it would be
+                  held for a default of 2 years privately.
     hold_date, date: The date to which you like to release your data publicly.  default is two years.
     out_dir, str : name of the new xml file
 
     return
     ------
-
     outfile, file : a submission.xml file needed for ENA submission.
-
-	'''
+    """
 
     xml_files = ["study", "sample", "experiment", "run"]
 
@@ -686,18 +728,22 @@ def submission_xml(refname, center_name, out_dir, release=False, hold_date=''):
     for xml_file in xml_files:
         action = ET.SubElement(actions, "ACTION")
         add = ET.SubElement(action, "ADD", source=xml_file + ".xml", schema=xml_file)
+        del add
 
     # if a hold date is given until releasing publicly
     action = ET.SubElement(actions, "ACTION")
 
     if hold_date:
         hold = ET.SubElement(action, "HOLD", HoldUntilDate=hold_date)
+        del hold
     # else if release is given, i.e. release immediatley to the public
     elif release:
         release = ET.SubElement(action, "RELEASE")
+        del release
     # otherwise hold for two years and then make it public
     else:
         hold = ET.SubElement(action, "HOLD")
+        del hold
     # use the indent function to indent the xml file
     indent(submission_set)
     # create tree
@@ -711,12 +757,13 @@ def submission_xml(refname, center_name, out_dir, release=False, hold_date=''):
 
 
 def run_curl_command(ftp_user_name, ftp_password, out):
-    '''
-	run_curl_command(ftp_user_name,ftp_password)
-	
-	This function executes the curl command that would upload all the xml files to ENA.  The function first runs a test command and if successfull automatically runs the production command.
+    """
+    run_curl_command(ftp_user_name,ftp_password)
+    
+    This function executes the curl command that would upload all the xml files to ENA. The function first runs a test
+    command and if successfull automatically runs the production command.
 
-	Params
+    Params
     ------
 
     ftp_user_name, str: You must provide your ENA ftp username, e.g. Webin-40432
@@ -725,30 +772,46 @@ def run_curl_command(ftp_user_name, ftp_password, out):
 
     return
     ------
-
     receipt.xml, file: stdout of the curl command.
+    """
 
-	'''
     # first do a test...
 
-    test_cmd = "curl -k -F \"SUBMISSION=@submission.xml\" -F \"STUDY=@study.xml\" -F \"SAMPLE=@sample.xml\" -F \"EXPERIMENT=@experiment.xml\" -F \"RUN=@run.xml\" \"https://www-test.ebi.ac.uk/ena/submit/drop-box/submit/?auth=ENA%20\"" + ftp_user_name + "%20" + ftp_password
-    prod_cmd = "\ncurl -k -F \"SUBMISSION=@submission.xml\" -F \"STUDY=@study.xml\" -F \"SAMPLE=@sample.xml\" -F \"EXPERIMENT=@experiment.xml\" -F \"RUN=@run.xml\" \"https://www.ebi.ac.uk/ena/submit/drop-box/submit/?auth=ENA%20\"" + ftp_user_name + "%20" + ftp_password
-
+    test_cmd = "curl -k -F \"SUBMISSION=@submission.xml\" -F \"STUDY=@study.xml\" -F \"SAMPLE=@sample.xml\"" \
+               " -F \"EXPERIMENT=@experiment.xml\" -F \"RUN=@run.xml\"" \
+               " \"https://www-test.ebi.ac.uk/ena/submit/drop-box/" \
+               "submit/?auth=ENA%20\"{ftp_user_name}%20{ftp_password}".format(ftp_user_name=ftp_user_name,
+                                                                              ftp_password=ftp_password)
+    prod_cmd = "curl -k -F \"SUBMISSION=@submission.xml\" -F \"STUDY=@study.xml\" -F \"SAMPLE=@sample.xml\"" \
+               " -F \"EXPERIMENT=@experiment.xml\" -F \"RUN=@run.xml\"" \
+               " -o receipt.ena_final_server.xml" \
+               " \"https://www.ebi.ac.uk/ena/submit/drop-box/" \
+               "submit/?auth=ENA%20\"{ftp_user_name}%20{ftp_password}".format(ftp_user_name=ftp_user_name,
+                                                                              ftp_password=ftp_password)
     # p = subprocess.Popen(cmd, stdout=subprocess.PIPE, cwd=out, shell=True)
     receipt_xml = open(out + "/receipt.xml", 'w')
     print "\nRunning curl command....\n"
     p = subprocess.Popen(test_cmd, stdout=receipt_xml, cwd=out, shell=True)
     (curl_output, err) = p.communicate()
+    del curl_output, err
 
     if "success=\"false\"" in open(out + "/receipt.xml").read():
-        print "\nERROR: There is a problem with the submission.  Please check the file ", out + "/receipt.xml", "and correct the error and re-submit using the -curl command.\n"
+        print "\nERROR: There is a problem with the submission. Please check the file {out}/receipt.xml and correct" \
+              " the error and re-submit using the -curl command.\n".format(out=out)
         sys.exit()
     # elif "success=\"true\"" in open(out+"/receipt.xml").read():
-    # 	print "\nTest submission is successfull!"
-    # 	print "\nSubmitting production now..."
-    # 	p = subprocess.Popen(prod_cmd, stdout=receipt_xml, cwd=out, shell=True)
-    # 	(curl_output, err) = p.communicate()
+    #     print "\nTest submission is successfull!"
+    #     print "\nSubmitting production now..."
+    #     p = subprocess.Popen(prod_cmd, stdout=receipt_xml, cwd=out, shell=True)
+    #     (curl_output, err) = p.communicate()
     elif "success=\"true\"" in open(out + "/receipt.xml").read():
-        print "\nSUCCESS! Your data is now ready to be uploaded to production.  Note that if you decide to upload your data to production then it would be very difficult to delete it.  So if you are happy with this then run the following command:\n " + prod_cmd
-
-        print "\n NOTE: you must run the above curl command from the output dir which contains all the xml files."
+        print "\n" \
+              "SUCCESS! Your data is now ready to be uploaded to production. Note that if you decide to upload" \
+              " your data to production then it would be very difficult to delete it. So if you are happy with this" \
+              " then run the following command:\n" \
+              "\n" \
+              "{prod_cmd}\n" \
+              "\n" \
+              "NOTE! you must run the above curl command from the output dir which contains all the xml files:\n" \
+              "\n" \
+              "{out}/".format(prod_cmd=prod_cmd, out=out)
