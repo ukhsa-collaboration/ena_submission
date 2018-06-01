@@ -219,8 +219,13 @@ Merge the remote changes before pushing again
     parser.add_argument('--read_sdev', '-sdev', help='Please provide the read stdv. default = 0.0', default='0.0')
     parser.add_argument('--instrument_model', '-m', help='please provide the name of the instrument model used. default = Illumina HiSeq 2500', default='Illumina HiSeq 2500')
     parser.add_argument('--filetype', '-F', help='Please provide the file type, default=fastq', default='fastq')
-    parser.add_argument('--hold_date', '-ho', help='This option will hold the data privately until a specified date.  Please provide the specified date using the following format: YYYY-MM-DD')
-    parser.add_argument('--release', '-R', help='This option will release the data immediatley to the public domain. Cannot be used with --hold_date. default = False', default=False, action='store_true')
+    parser.add_argument('--hold_date', '-ho', help='This option will hold the data privately until a specified date.'
+                                                   ' Please provide the specified date using the following format:'
+                                                   ' YYYY-MM-DD',
+                        required=False)
+    parser.add_argument('--release', '-R', help='This option will release the data immediatley to the public domain.'
+                                                ' Cannot be used with --hold_date. default = False', default=False,
+                        action='store_true')
     parser.add_argument('--curl_command', '-curl', help='Run curl command to upload everything to ENA',action='store_true')
     parser.add_argument('--create_checksums_file', '-cs', help='Create a checksum file',action='store_true')
     parser.add_argument('--upload_data_to_ena_ftp_server', '-ftp', help='Upload data into the ftp server',action='store_true')
@@ -316,7 +321,7 @@ def main(opts):
         populate_data_to_ENA.experiment_xml(opts.dir_of_input_data,opts.data_file,opts.refname,opts.center_name,opts.library_strategy,opts.library_source,opts.library_selection,opts.read_length,opts.read_sdev,opts.instrument_model, opts.fastq_ends, opts.out_dir)
         populate_data_to_ENA.run_xml(opts.dir_of_input_data,opts.refname,opts.center_name,opts.filetype,opts.out_dir, opts.fastq_ends)
         populate_data_to_ENA.study_xml(opts.title_and_abstract_file,opts.center_name,opts.refname,opts.out_dir)
-        populate_data_to_ENA.submission_xml(opts.refname,opts.center_name,opts.out_dir,opts.hold_date)
+        populate_data_to_ENA.submission_xml(opts.refname, opts.center_name, opts.out_dir, opts.release, opts.hold_date)
 
         print "\nAll your xml files have been generated successfully in", opts.out_dir, "\n"
 
@@ -398,7 +403,7 @@ def main(opts):
         check_if_flag_is_provided(opts.out_dir,"out_dir","-o")
         make_dir_if_not_made(opts.out_dir)
 
-        populate_data_to_ENA.submission_xml(opts.refname,opts.center_name,opts.out_dir,opts.release,opts.hold_date)
+        populate_data_to_ENA.submission_xml(opts.refname, opts.center_name, opts.out_dir, opts.release, opts.hold_date)
 
         print "\nYour", opts.generate_xml_file_for,".xml file have been generated successfully in", opts.out_dir
 
@@ -414,10 +419,14 @@ def main(opts):
         populate_data_to_ENA.check_data_file(opts.data_file)
         populate_data_to_ENA.sample_xml(opts.dir_of_input_data, opts.refname, opts.data_file, opts.center_name,
                                         opts.out_dir, opts.fastq_ends, opts.sample_checklist)
-        populate_data_to_ENA.experiment_xml(opts.dir_of_input_data,opts.data_file,opts.refname,opts.center_name,opts.library_strategy,opts.library_source,opts.library_selection,opts.read_length,opts.read_sdev,opts.instrument_model, opts.fastq_ends, opts.out_dir)
-        populate_data_to_ENA.run_xml(opts.dir_of_input_data,opts.refname,opts.center_name,opts.filetype,opts.out_dir, opts.fastq_ends)
+        populate_data_to_ENA.experiment_xml(opts.dir_of_input_data, opts.data_file, opts.refname, opts.center_name,
+                                            opts.library_strategy, opts.library_source, opts.library_selection,
+                                            opts.read_length, opts.read_sdev, opts.instrument_model, opts.fastq_ends,
+                                            opts.out_dir)
+        populate_data_to_ENA.run_xml(opts.dir_of_input_data,opts.refname,opts.center_name,opts.filetype,opts.out_dir,
+                                     opts.fastq_ends)
         populate_data_to_ENA.study_xml(opts.title_and_abstract_file,opts.center_name,opts.refname,opts.out_dir)
-        populate_data_to_ENA.submission_xml(opts.refname,opts.center_name,opts.out_dir,opts.hold_date)
+        populate_data_to_ENA.submission_xml(opts.refname, opts.center_name, opts.out_dir, opts.release, opts.hold_date)
 
     else:
         print "You need any help?  Use the -h option."

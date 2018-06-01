@@ -48,6 +48,7 @@ def check_data_file(data_file):
     ------
     None
     """
+
     meta_data_file = file(data_file, 'U')
     # the data file should have this heading...
     data_file_heading = ['sample_name', 'taxon', 'organism', 'description']
@@ -86,6 +87,7 @@ def check_abstract_file(title_and_abstract_file):
     ------
     None
     """
+
     try:
         with open(title_and_abstract_file, 'U') as f:
             lines = f.readlines()
@@ -118,6 +120,7 @@ def rchop(string, ending):
     string : str
         The original string without the ending part, e.g. 'sample'
     """
+
     if string.endswith(ending):
         string = string[:-len(ending)]
     return string
@@ -143,8 +146,8 @@ def create_checksums_file(dir_of_input_data, refname, filetype, fastq_ends):
     ------
     checksums_file, file : a checksum file will be created in the dir_of_input_data directory.
                            It would be called: refname_"checksums.md5".
-
     """
+
     try:
         if filetype == "fastq":
             files = glob.glob(dir_of_input_data + "/*" + fastq_ends[0])
@@ -205,7 +208,7 @@ def upload_data_to_ena_ftp_server(dir_of_input_data, refname, ftp_user_name, ftp
     fastq_ends, tuple: Tuple of strings of size 2 with fastq files end, e.g. ('.R1.fastq.gz', '.R2.fastq.gz')
 
     return
-    ------   
+    ------
     None
     """
 
@@ -333,12 +336,9 @@ def create_dict_with_data(dir_of_input_data, refname, data_file, fastq_ends, hea
     header, True or False :  if True the first line will be considered a header line
     fastq_ends, tuple: Tuple of strings of size 2 with fastq files end, e.g. ('.R1.fastq.gz', '.R2.fastq.gz')
 
-
     return
     ------
-
     sample_id_and_data, dict : a dictionary that has the headings as keys and the data as values.
-
     """
 
     meta_data_file = file(data_file, 'U')
@@ -697,7 +697,7 @@ def study_xml(title_and_abstract_file, center_name, refname, out_dir):
     print "\nSuccessfully created study.xml file\n"
 
 
-def submission_xml(refname, center_name, out_dir, release=False, hold_date=''):
+def submission_xml(refname, center_name, out_dir, release=False, hold_date=None):
     """
     submission_xml(refname,center_name,out_dir,release,hold_date='')
     
@@ -733,7 +733,7 @@ def submission_xml(refname, center_name, out_dir, release=False, hold_date=''):
     # if a hold date is given until releasing publicly
     action = ET.SubElement(actions, "ACTION")
 
-    if hold_date:
+    if hold_date is not None:
         hold = ET.SubElement(action, "HOLD", HoldUntilDate=hold_date)
         del hold
     # else if release is given, i.e. release immediatley to the public
@@ -765,10 +765,8 @@ def run_curl_command(ftp_user_name, ftp_password, out):
 
     Params
     ------
-
     ftp_user_name, str: You must provide your ENA ftp username, e.g. Webin-40432
     ftp_password, str: You must provide your ENA ftp password
-   
 
     return
     ------
