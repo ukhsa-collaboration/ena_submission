@@ -427,9 +427,9 @@ def sample_xml(dir_of_input_data, refname, data_file, center_name, out_dir, fast
     sample_id_and_data = create_dict_with_data(dir_of_input_data, refname, data_file, fastq_ends)
     if {'sample_name', 'taxon', 'organism', 'description'} <= set(sample_id_and_data):
         sample_set = ET.Element('SAMPLE_SET')
-        sample_scientific_name_description = {'sample_name', 'taxon', 'organism', 'description'}
+        sample_scientific_name_description = ['sample_name', 'taxon', 'organism', 'description']
         all_keys_in_a_lits = set(sample_id_and_data.keys())
-        remaining_keys = all_keys_in_a_lits - sample_scientific_name_description
+        remaining_keys = all_keys_in_a_lits - set(sample_scientific_name_description)
 
         for index, sample_name in enumerate(sample_id_and_data["sample_name"]):
             for key in sample_scientific_name_description:
