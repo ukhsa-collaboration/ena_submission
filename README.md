@@ -35,13 +35,15 @@ To upload your files to ENA, you will need the following:
   MN127.R1.fastq.gz
   
   MN127.R2.fastq.gz
+  
+  If your files end differently (from ".R1.fastq.gz" and ".R2.fastq.gz"), provide the proper files end with --fastq_end option
 
   Otherwise, if you are uploading a different type of file, like bam files or fasta files, you can name them whatever you like but they should have the prefix at the end, e.g. .bam or .fasta.  Use the -F flag to do so, e.g. -F bam.
 
 2. A csv (comma separated values) file that contains all the information for each of your samples.  The text file should contain four required columns.  You may add as many columns of data as you wish after the fourth required column.  The columns are separated by commas.  e.g. (note the headings are required as seen below):
 
 
-  SAMPLE,TAXON_ID,SCIENTIFIC_NAME,DESCRIPTION
+  sample_name, taxon, organism, description
 
   data....
 
@@ -160,10 +162,10 @@ You should familarise yourself with the other options before you begin running t
     --data_file DATA_FILE, -f DATA_FILE
                           data_file, file : this text file must have at least
                           four columns seperated by TABS in the following order
-                          and with the following headings: Column 1: SAMPLE,
-                          Column 2: TAXON_ID, Column 3: SCIENTIFIC_NAME, Column
-                          4: DESCRIPTION. If you like to add further data then
-                          add it after the DESCRIPTION column.
+                          and with the following headings: Column 1: sample_name,
+                          Column 2: taxon, Column 3: organism,
+                          Column 4: description. If you like to add further data
+                          then add it after the description column.
     --ftp_user_name FTP_USER_NAME, -user FTP_USER_NAME
                           please provide the ftp user name
     --ftp_password FTP_PASSWORD, -pass FTP_PASSWORD
@@ -173,9 +175,12 @@ You should familarise yourself with the other options before you begin running t
                           is needed to generate the study.xml file. The file
                           should be in the following format: full title of the
                           project abstract
-    --center_name CENTER_NAME, -c CENTER_NAME
-                          Please provide the center name
-    --refname REFNAME, -r REFNAME
+    -c "Public Health England", --center_name "Public Health England"
+                          Please provide the center name. The center name is a
+                          controlled vocabulary identifying the sequencing
+                          center, core facility, consortium, or laboratory
+                          responsible for the study.
+    -r PHE_20180125, --refname PHE_20180125
                           Please provide the unique name for the whole
                           submission. This name must not have been used before
                           in any other submission to ENA.
@@ -213,6 +218,22 @@ You should familarise yourself with the other options before you begin running t
     --out_dir OUT_DIR, -o OUT_DIR
                           please provide the path to the output directory which
                           will include all the xml files.
+    --fastq_ends .R1.fastq.gz .R2.fastq.gz
+                          By default, ena_submission.py searches for pair-end
+                          fastq files ending with ".R1.fastq.gz" and
+                          ".R2.fastq.gz". If your fastq files end differently,
+                          you can provide two strings containing the end of
+                          fastq files names (for example, "_1.fastq.gz" and
+                          "_2.fastq.gz")
+    --sample_checklist ERC000029
+                          ENA provides sample checklists which define all the
+                          mandatory and recommended attributes for specific types
+                          of samples. By declaring that you would like to
+                          register your samples using a specific checklist you
+                          are enabling the samples to be validated for
+                          correctness at submission time and are making it easier
+                          for other services to find and access the sample
+                          attribute information.
 
 
 ## Contact
